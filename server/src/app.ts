@@ -55,7 +55,7 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
   });
 
   // sağlık: oturumsuz açık (Railway denetimi); kasa yolu ya da not içeriği vermez
-  app.get("/api/health", async () => ({ ok: true, surum: VERSION, notlar: vault.notes().length, claude: hasClaude, giris: auth.enabled ? "açık" : "kapalı" }));
+  app.get("/api/health", async () => ({ ok: true, surum: VERSION, commit: (process.env.RAILWAY_GIT_COMMIT_SHA ?? "").slice(0, 7) || null, notlar: vault.notes().length, claude: hasClaude, giris: auth.enabled ? "açık" : "kapalı" }));
   app.get("/api/model", async () => model());
   app.get("/api/issues", async () => check(vault.notes(), schema));
 
