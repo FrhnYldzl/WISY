@@ -113,7 +113,7 @@ export class Writer {
         const n = this.resolve(p.hedef); if (!n?.type) throw bad(`Kayıt bulunamadı: ${p.hedef}`, 404);
         const allowed = EDITABLE[n.type] ?? [];
         if (!allowed.includes(p.alan)) throw bad(`${n.type}.${p.alan} panelden/ajandan değiştirilemez (izinli: ${allowed.join(", ")})`, 403);
-        this.setGuarded(n, p.alan, this.norm(p.alan, p.deger, n));
+        this.setGuarded(n, p.alan, this.enumOf(n.type, p.alan, this.norm(p.alan, p.deger, n)));
         return { ok: true, yazilan: [n.rel], ozet: `${n.title}: ${p.alan} güncellendi` };
       }
       case "kanit_ekle": {
@@ -128,8 +128,9 @@ export class Writer {
         const fm: FM = { type: p.tip };
         const titleKey = p.tip === "varlik" || p.tip === "sicil" ? "ad" : p.tip === "kavram" ? null : "baslik";
         if (titleKey) fm[titleKey] = p.baslik;
-        for (const [k, v] of Object.entries(p.alanlar)) if (k !== "type") fm[k] = this.norm(k, v as Val);
+        for (const [k, v] of Object.entries(p.alanlar)) if (k !== "type") fm[k] = this.enumOf(p.tip, k, this.norm(k, v as Val));
         if (!("taraf" in fm) && p.tip !== "kavram" && p.tip !== "sicil") fm.taraf = "kisisel";
+        this.defaults(p.tip, fm);
         // proje: hikaye kartı doluysa bile ilk durum fikir/hazırlık — aktif'e geçiş ayrı onayla
         if (p.tip === "proje" && ["aktif", "tamamlandi"].includes(str(fm.durum))) fm.durum = "hazirlik";
         if (p.tip === "icerik" && ["onay", "yayinda"].includes(str(fm.durum))) fm.durum = "taslak";
@@ -138,6 +139,23 @@ export class Writer {
         return { ok: true, yazilan: [n.rel], ozet: `${p.tip} notu açıldı: ${p.baslik}` };
       }
     }
+  }
+  /** Şema enum'u olan alanda Türkçe/büyük harfli değeri ASCII karşılığına çevir: "Kişisel" → kisisel, "yaratıcı-aktif" → yaratici_aktif */
+  private enumOf(type: string, key: string, v: Val): Val {
+    const en = this.schema.types[type]?.enums[key]; const allowed = en ? this.schema.enums[en] ?? [] : [];
+    if (!allowed.length || typeof v !== "string" || allowed.includes(v)) return v;
+    const f = slugify(v).replace(/-/g, "_");
+    return allowed.find((a) => a === f || a.toLowerCase() === v.toLocaleLowerCase("tr")) ?? v;
+  }
+  /** Yalnız güvenle çıkarılabilen zorunlu alanları tamamla; tahmin gerektirenler (varlık sınıfı, kanal…) boş kalır ve kural motoru adıyla söyler */
+  private defaults(tip: string, fm: FM) {
+    const set = (k: string, v: Val) => { if (fm[k] == null || fm[k] === "") fm[k] = v; };
+    if (tip === "kaynak") { set("kaynak_turu", "kitap"); set("ortam", ["kitap", "dergi"].includes(str(fm.kaynak_turu)) ? "fiziksel" : "dijital"); }
+    if (tip === "kavram") { set("eksen_disiplin", "belirlenecek"); set("eksen_fonksiyon", "belirlenecek"); set("eksen_sektor", "belirlenecek"); set("ilgili", []); }
+    if (tip === "modul") set("durum", "planli");
+    if (tip === "proje") set("durum", "fikir");
+    if (tip === "icerik") set("durum", "taslak");
+    if (tip === "sicil") set("kanit", "eklenecek");
   }
   private free(id: string) { const ids = new Set(this.vault.notes().map((n) => n.id)); let x = id, i = 2; while (ids.has(x)) x = `${id}-${i++}`; return x; }
   /** Bağlantı alanlarını [[id]] biçimine çevir; listeleri koru */

@@ -3,7 +3,7 @@ import { cpSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { extractProposals, loadAgents } from "./agents.ts";
+import { extractProposals, loadAgents, systemFor } from "./agents.ts";
 import { buildApp } from "./app.ts";
 import { authFromEnv, hashPassword, verifyPassword } from "./auth.ts";
 import { Writer } from "./apply.ts";
@@ -136,4 +136,24 @@ test("giriş: dağıtımda parolasız başlamaz; parola ve oturum doğrulanır",
     assert.equal((await app.inject({ url: "/api/model", headers: { cookie } })).statusCode, 200);
     assert.equal((await app.inject({ url: "/api/model", headers: { cookie: cookie.slice(0, -3) + "xxx" } })).statusCode, 401);
   } finally { await app.close(); }
+});
+
+test("öneri: Kütüphaneci'nin eksik alanlı kaynak notu tamamlanır, Türkçe enum ASCII'ye çevrilir", () => {
+  const v = tmpVault(); const w = new Writer(v, schema);
+  w.apply({ tur: "not_olustur", tip: "kaynak", baslik: "Savaş Üzerine — Carl von Clausewitz", alanlar: { birincil_kimlik: "harbiyeli-ve-subay", taraf: "Kişisel" }, govde: "Çekirdek kaynak." });
+  const n = v.notes().find((x) => x.type === "kaynak" && x.title.startsWith("Savaş"))!;
+  assert.equal(n.fm.kaynak_turu, "kitap"); assert.equal(n.fm.ortam, "fiziksel"); assert.equal(n.fm.taraf, "kisisel");
+  assert.equal(check(v.notes(), schema).filter((i) => i.sev === "hata").length, 0);
+  // tahmin edilemeyen zorunlu alan (varlik_sinifi) yine adıyla reddedilir
+  assert.throws(() => w.apply({ tur: "not_olustur", tip: "varlik", baslik: "Seri kitapçık", alanlar: {} }), /varlik_sinifi/);
+  // evre Türkçe yazılsa da şemadaki değere iner
+  w.apply({ tur: "alan_guncelle", hedef: "kriz-yonetimi", alan: "evre", deger: "Yaratıcı-aktif" });
+  assert.equal(v.get("kriz-yonetimi")!.fm.evre, "yaratici_aktif");
+});
+
+test("ajan talimatı şemadaki zorunlu alanları listeler", () => {
+  const { agents } = loadAgents(ROOT);
+  const s = systemFor(ROOT, agents.find((a) => a.id === "kutuphaneci")!, agents);
+  assert.match(s, /- kaynak: kaynak_turu \(kitap\|makale/);
+  assert.match(s, /ortam \(fiziksel\|dijital\)/);
 });

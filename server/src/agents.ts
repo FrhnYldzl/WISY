@@ -5,6 +5,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Proposal } from "./apply.ts";
 import type { Model } from "./model.ts";
+import { loadSchema } from "./rules.ts";
 import { parseFrontmatter, str } from "./vault.ts";
 
 export interface AgentDef { id: string; ad: string; katman: string; kisa: string; aciklama: string; govde: string; kaynaklar: string[] }
@@ -95,6 +96,13 @@ export function systemFor(root: string, agent: AgentDef, all: AgentDef[]): strin
   const uyum = existsSync(join(root, "docs", "06-kurallar-ve-uyum.md")) ? readFileSync(join(root, "docs", "06-kurallar-ve-uyum.md"), "utf-8") : "";
   // ajan tanımındaki dosya-aracı adımları panelde sunucuya devredilir
   const body = agent.govde.replace(/^- Her yazımdan sonra.*$/m, "- Doğrulayıcı sunucuda her yazımdan sonra otomatik çalışır.").replace(/^- Kasaya yazmadan önce.*$/m, "- Kasaya yazmak yerine değişiklikleri öneri bloğunda listele.");
+  // not_olustur için zorunlu alanlar ve izinli değerler şemadan (schema/entities.yaml) — şema değişince talimat da değişir
+  const schema = loadSchema(join(root, "schema", "entities.yaml"));
+  const fields = ["kaynak", "kavram", "modul", "proje", "icerik", "varlik", "sicil"].map((t) => {
+    const s = schema.types[t]; if (!s) return "";
+    const req = s.required.filter((f) => !["type", "baslik", "ad"].includes(f)).map((f) => { const en = s.enums[f]; return en ? `${f} (${(schema.enums[en] ?? []).join("|")})` : f; });
+    return `- ${t}: ${req.join(", ") || "—"}`;
+  }).filter(Boolean).join("\n");
   const roster = all.filter((a) => a.id !== "orkestrator").map((a) => `- ${a.ad} (\`${a.id}\`, katman ${a.katman}): ${a.aciklama.replace(/^Wisy katman [^.]*\.\s*/, "")}`).join("\n");
   const self = agent.id === "orkestrator"
     ? `Sen Wisy'nin orkestratörüsün. Ferhan'ın isteğini ana hikayenin doğru katmanına yönlendirirsin. Ajan kadron:\n${roster}\n\nYanıtına hangi ajanın bakışıyla çalıştığını bir satırla belirterek başla ("Yönlendirme: Hoca → Proje mimarı"). Gerekirse birkaç ajanın işini sırayla yap.`
@@ -102,6 +110,7 @@ export function systemFor(root: string, agent: AgentDef, all: AgentDef[]): strin
   return [
     `Wisy, Ferhan'ın kişisel Vibe Management sistemi: okunan ve öğrenilen her şeyi kartlara, kavramlara, kimliklere ve yeteneklere bağlar; öğrenmeyi projelere, projeleri kalıcı varlıklara dönüştürür.`,
     self, `## ${main.trim()}`, `## ${rules.trim()}`, uyum.trim(), PROTOCOL,
+    `## not_olustur zorunlu alanları (alanlar içinde ver; değerler ASCII, parantezdeki listeden)\n${fields}\nBağlantı alanları (birincil_kimlik, yetenekler, kavramlar…) bağlamdaki id'lerle. Bir alanı bilmiyorsan öneriyi verme, Ferhan'a sor.`,
     `## Yazım\nTürkçe, sakin ve kesin. Kısa paragraflar, gerektiğinde tablo. Emoji yok, motivasyon sloganı yok. Bağlamda olmayan rakam uydurma; bilinmeyeni "belirlenecek" diye yaz.`,
   ].join("\n\n");
 }
