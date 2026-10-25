@@ -1,0 +1,513 @@
+<title>Wisy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: vertical strata from sources to outputs, read top-down like a map legend; meridian lines mark the header */
+:root{
+  --bg:#F5F7F8; --surface:#FFFFFF; --fg:#13212B; --muted:#55646E; --line:#D5DDE2;
+  --core:#0E6B68; --core-soft:#E2F1EF; --asset:#9A6A12; --asset-soft:#F6EBD5;
+  --agent:#4B4F9C; --agent-soft:#E9E9F7; --in-soft:#EDF1F3;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E151A; --surface:#152028; --fg:#E3EAEE; --muted:#9AAAB4; --line:#2A3943;
+  --core:#5CC4B8; --core-soft:#163631; --asset:#E1B261; --asset-soft:#3A2D14;
+  --agent:#A9ACF0; --agent-soft:#24264A; --in-soft:#1A262E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E151A; --surface:#152028; --fg:#E3EAEE; --muted:#9AAAB4; --line:#2A3943;
+  --core:#5CC4B8; --core-soft:#163631; --asset:#E1B261; --asset-soft:#3A2D14;
+  --agent:#A9ACF0; --agent-soft:#24264A; --in-soft:#1A262E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:1080px;margin:0 auto}
+header{padding-block:40px 28px;border-bottom:1px solid var(--line);
+  background-image:repeating-linear-gradient(90deg,transparent 0 79px,var(--line) 79px 80px);background-position:right top}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--core)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,48px);line-height:1.08;margin:8px 0 10px;text-wrap:balance;max-width:16ch}
+.lede{max-width:62ch;color:var(--muted);margin:0;background:var(--bg)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:var(--mono);font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.chip.in{background:var(--in-soft)} .chip.core{background:var(--core-soft);color:var(--core);border-color:transparent}
+.chip.asset{background:var(--asset-soft);color:var(--asset);border-color:transparent}
+.chip.agent{background:var(--agent-soft);color:var(--agent);border-color:transparent}
+h2{font-family:var(--display);font-weight:700;font-size:24px;margin:48px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 20px;max-width:62ch}
+.stratum{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:start}
+.rail{padding-top:6px}
+.rail .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.rail .t{font-family:var(--display);font-weight:500;font-size:17px;line-height:1.2}
+.rail .ag{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:11.5px;padding:3px 8px;border-radius:999px;background:var(--agent-soft);color:var(--agent)}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:16px;margin:0 0 6px}
+.card p{margin:0;color:var(--muted);font-size:14.5px}
+.card ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;color:var(--muted)}
+.card li{margin:2px 0}
+.card.in{background:var(--in-soft);border-color:transparent}
+.card.core{background:var(--core-soft);border-color:transparent}
+.card.core h3{color:var(--core)}
+.card.asset{background:var(--asset-soft);border-color:transparent}
+.card.asset h3{color:var(--asset)}
+.card.hero{padding:20px}
+.card.hero h3{font-size:22px}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.flow{display:grid;grid-template-columns:150px 1fr;gap:16px}
+.flow div:last-child{font-family:var(--mono);font-size:12px;color:var(--muted);padding:10px 0 10px 12px;border-left:2px solid var(--line);margin:4px 0}
+.loop{margin-top:16px;padding:12px 16px;border:1px dashed var(--core);border-radius:10px;color:var(--core);font-size:14.5px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inner{margin-top:10px;padding:10px 12px;border:1px dashed var(--asset);border-radius:8px}
+.inner strong{color:var(--asset);font-family:var(--display);font-weight:500}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tbody th{font-family:var(--display);font-weight:500;font-size:15px;white-space:nowrap}
+tbody th small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+tr:last-child td,tr:last-child th{border-bottom:0}
+td.star{background:var(--asset-soft);color:var(--asset);font-weight:600}
+.pl{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fn{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-width:76px}
+.pl .hl{color:var(--asset);font-weight:600}
+thead th.grp{font-family:var(--display);font-size:15px;letter-spacing:0;text-transform:none;color:var(--fg);width:39%}
+.agents{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.agents .card h3{color:var(--agent)}
+.agents .card .tag{color:var(--agent)}
+.h3{font-family:var(--display);font-weight:500;font-size:18px;margin:28px 0 8px}
+.steps{display:grid;gap:8px;max-width:760px}
+.step{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px}
+.step b{font-family:var(--display);font-weight:500}
+.sn{font-family:var(--mono);font-size:13px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--core-soft);color:var(--core)}
+.chain{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));counter-reset:c}
+.chain li{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;counter-increment:c;min-width:0}
+.chain li::before{content:counter(c);font-family:var(--mono);font-size:11px;color:var(--core);display:block;margin-bottom:4px}
+.chain li:last-child{background:var(--asset-soft);border-color:transparent}
+.chain b{font-family:var(--display);font-weight:500;font-size:17px;display:block}
+.chain span{font-size:13.5px;color:var(--muted)}
+table.narrow{min-width:0}
+.story{display:grid;grid-template-columns:84px 1fr;gap:6px 12px;margin:8px 0 0;font-size:14.5px}
+.story dt{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.story dd{margin:0}
+.qs{display:grid;gap:10px;padding:0;list-style:none;margin:0}
+.qs li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.qs b{font-family:var(--display);font-weight:500}
+@media (max-width:720px){
+  .stratum,.flow{grid-template-columns:1fr;gap:8px}
+  .flow div:first-child{display:none}
+  .split{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Kişisel Vibe Management · BİLGE dikeyi</div>
+  <h1>Wisy</h1>
+  <p class="lede">Şirketler için Vibe Management neyse, kişi için Wisy odur. Okunan, biriktirilen ve öğrenilen her şeyi tek bir kavram evreninde toplayan, ajanlarla işleyen ve iki çıktıya dönüştüren sistem: kişisel markayı besleyen medya ve kalıcı değer taşıyan varlık portföyü. Amacı, geçmiş ve güncel kimliklerin birikimini birbirine bağlayıp aralarındaki sinerjiyi günlük disiplinle kaldıraçlamak.</p>
+  <div class="legend">
+    <span class="chip in">Girdi</span><span class="chip core">Çekirdek</span><span class="chip asset">Varlık / çıktı</span><span class="chip agent">Ajan</span>
+  </div>
+</header>
+
+<h2>Ana hikaye</h2>
+<p class="sub">Bütün sistem tek bir dönüşüm hikayesini anlatır. Her katman bu zincirin bir halkasıdır.</p>
+<ol class="chain">
+  <li><b>Kavramlar</b><span>Ham madde. Okunan, biriktirilen, kartlanan.</span></li>
+  <li><b>Kimlikler</b><span>Kavramı anlamlı kılan rol. “Bu kimin için?”</span></li>
+  <li><b>Yetenekler</b><span>Kimliğin ölçülebilir hali. Her kimliğin seti var.</span></li>
+  <li><b>Öğrenme</b><span>Yeteneği bir evre ileri taşıyan müfredat ve modül.</span></li>
+  <li><b>Projeler</b><span>Büyüyen yeteneği değere çeviren çıktı.</span></li>
+  <li><b>Varlıklar</b><span>Kalıcı birikim: IP, yayın, kurs, unvan, itibar.</span></li>
+</ol>
+
+<h2>Wisy ve Vibe Management</h2>
+<p class="sub">Aynı zincir iki tarafta ayrı işler: şirket için Vibe Management, kişi için Wisy. Taraflar birbirini besler, ama kayıt, kaynak ve sahiplik ayrı tutulur.</p>
+<div class="tablewrap">
+<table class="narrow">
+  <thead><tr><th>Halka</th><th class="grp">Wisy · kişi</th><th class="grp">Vibe Management · şirket</th></tr></thead>
+  <tbody>
+    <tr><th>Kavram</th><td>Kişisel kavram evreni</td><td>Sektör ve iş kavramları</td></tr>
+    <tr><th>Kategori</th><td>Kimlikler ve dikeyler</td><td>Sektör, fonksiyon, iş kolu</td></tr>
+    <tr><th>Yetenek</th><td>Kişisel yetenekler ve evreleri</td><td>Kurumsal yetkinlikler ve ekip</td></tr>
+    <tr><th>Öğrenme</th><td>Kişisel üniversite</td><td>Ekip eğitimi ve süreç bilgisi</td></tr>
+    <tr><th>Proje</th><td>Kişisel projeler</td><td>Şirket projeleri</td></tr>
+    <tr><th>Varlık</th><td>Kişisel bilanço ve entelektüel varlıklar</td><td>Şirket bilançosu ve portföy</td></tr>
+    <tr><th>Marka konumlandırma</th><td>Kişisel marka</td><td>Şirket markası</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="cards" style="margin-top:12px">
+  <div class="card in"><span class="tag">Ayrım</span><h3>Çift etiket</h3><p>Her kart, proje ve varlık kişisel ya da şirket olarak etiketlenir. Ortak olanlar ikisini birden taşır ve bir birincil taraf seçer.</p></div>
+  <div class="card in"><span class="tag">Kaynak</span><h3>Zaman, para, dikkat</h3><p>Her iki tarafın haftalık kaynak bütçesi ayrı izlenir. Biri diğerini sessizce tüketmez.</p></div>
+  <div class="card in"><span class="tag">Sahiplik</span><h3>Varlık kimin?</h3><p>Kişisel emekle üretilen ile şirket kaynağıyla üretilen ayrılır; ortak IP sözleşmeyle belgelenir. Örnek: Meridyen kişiseldir, şirkete giden modülleri sözleşmeyle aktarılır.</p></div>
+  <div class="card in"><span class="tag">Köprü</span><h3>Neyin geçtiği</h3><p>Kişiden şirkete yetenek, itibar ve ağ geçer; şirketten kişiye deneyim ve vaka. Gizli bilgi geçmez, rekabet yasağı alanları korunur.</p></div>
+</div>
+
+<h2>Ekosistem haritası</h2>
+<p class="sub">Yukarıdan aşağıya okunur: kaynaktan dağıtıma on bir katman. Her katmanda bir ajan çalışır; dağıtımdan dönen geri bildirim kavram evrenine yazılır.</p>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 0</div><div class="t">Kaynaklar ve veri</div><span class="ag">Kütüphaneci</span></div>
+  <div class="cards">
+    <div class="card in"><span class="tag">Fiziksel</span><h3>Kütüphaneler</h3><ul><li>Ev ve ofis kütüphanesi</li><li>Basılı kitap ve dergi</li><li>Tez için kullanılan kaynaklar</li></ul></div>
+    <div class="card in"><span class="tag">Dijital</span><h3>Arşivler</h3><ul><li>Masaüstü ve Drive</li><li>Eski hard disk</li><li>E-kitap, dergi, makale</li></ul></div>
+    <div class="card in"><span class="tag">Veri</span><h3>Dış veri</h3><ul><li>Piyasa, akademik, devlet</li><li>Raporlar, iş geliştirme</li><li>İnternet aramaları</li></ul></div>
+    <div class="card in"><span class="tag">Girdi kanalları</span><h3>Akış kaynakları</h3><ul><li>Bülten abonelikleri</li><li>Üniversite, sertifika ve lisans programları (SPL vb.)</li><li>Udemy, Borfin, MasterClass kursları</li><li>Mesleki zorunlu takip</li></ul></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ taranır, kataloglanır, metne dönüşür</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 1</div><div class="t">Alım ve dijital kartlar</div><span class="ag">Bültenci</span></div>
+  <div class="cards">
+    <div class="card"><span class="tag">Okurken</span><h3>Kalemle okuma</h3><p>Kenara not, altı çizili satır, kıvırılmış sayfa. Fiziksel kitapta fotoğraf, dijitalde işaret.</p></div>
+    <div class="card"><span class="tag">Sonra</span><h3>Bekleme</h3><p>Kitap bittikten bir iki hafta sonra işaretlere dönülür. Mesafe neyin gerçekten önemli olduğunu gösterir.</p></div>
+    <div class="card"><span class="tag">Kayıt</span><h3>Tek fikir, tek kart</h3><p>Her kart bir fikir, bir kaynak, bir tema ve bir birincil kimlik taşır. Dijital not olarak tutulur, temalara göre koleksiyonlarda toplanır.</p></div>
+    <div class="card"><span class="tag">Akış</span><h3>Bülten</h3><p>Şirketlerdeki bülten mantığı, kart koleksiyonlarından beslenir: dönemsel, seçilmiş, etiketli.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ dört haritada konumlanır</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 2</div><div class="t">Dört harita</div><span class="ag">Haritacı</span></div>
+  <div class="cards">
+    <div class="card"><span class="tag">Harita A</span><h3>Bilim alanları</h3><ul><li>Sosyal ↔ fen yelpazesi</li><li>Üniversite bölümleri</li><li>İlgi · etki · bilim filtreleri</li><li>80/20 önceliklendirme</li></ul></div>
+    <div class="card"><span class="tag">Harita B</span><h3>Üniversiteler</h3><ul><li>Doktora, yüksek lisans, sertifikalar</li><li>Live: güncel dersler ve programlar</li><li>Skillset: kazanılan yetkinlikler</li><li>Kurs platformları: Udemy, Borfin, MasterClass</li></ul></div>
+    <div class="card"><span class="tag">Harita C</span><h3>Şirketler</h3><ul><li>Fonksiyonlar: finans (bütçe, nakit akımı, bilanço), pazarlama, marka, satış, operasyon</li><li>Endüstri, sektör, kategori</li><li>E-ticaret, e-ihracat, halka açık şirketler</li></ul></div>
+    <div class="card"><span class="tag">Harita D</span><h3>Varlıklar</h3><ul><li>Kişisel ve şirket</li><li>Dönen (OPEX): nakit, vadeli; hisse, fon, döviz, altın</li><li>Duran (CAPEX): maddi, finansal, gayri maddi (IP)</li><li>Entelektüel: yetkinlik, sertifika, unvan</li></ul></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ tek bir anlam ağında birleşir</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 3</div><div class="t">Çekirdek</div><span class="ag">Haritacı</span></div>
+  <div class="cards">
+    <div class="card core hero"><span class="tag">Merkez</span><h3>Kavram evreni</h3><p>Her kavram üç eksende etiketlenir: disiplin × fonksiyon × sektör. Kaynaklar, notlar, projeler ve içerikler bu kavramlara bağlanır. Obsidian Master kasasının BİLGE dikeyinde yaşar.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ “bu hangi kimliğim için?” sorusuyla süzülür</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 4</div><div class="t">Kimlik filtresi</div><span class="ag">Kimlik yönlendirici</span></div>
+  <div class="cards">
+    <div class="card core"><span class="tag">Kök kimlikler · geçmiş</span><h3>Birikim üreten</h3><ul><li>Harbiyeli</li><li>Subay</li><li>Uluslararası ilişkiler mezunu</li></ul></div>
+    <div class="card core"><span class="tag">Mesleki · VARLIKLI</span><h3>Hizmet üreten</h3><ul><li>Avukat</li><li>Uluslararası tahkim uzmanı</li><li>Danışman ve mentor</li><li>Yönetim kurulu üyesi</li><li>Performans pazarlamacı</li></ul></div>
+    <div class="card core"><span class="tag">Kurucu ve yatırımcı · VARLIKLI</span><h3>Varlık üreten</h3><ul><li>Seri girişimci ve kurucu</li><li>E-ihracatçı</li><li>Yatırımcı ve aile ofisi yöneticisi</li><li>AI sistem mimarı</li></ul></div>
+    <div class="card core"><span class="tag">Akademik ve fikir · BİLGE</span><h3>Bilgi üreten</h3><ul><li>Akademisyen</li><li>Araştırmacı-yazar</li><li>Konuşmacı ve panelist</li><li>Eğitmen</li></ul></div>
+    <div class="card core"><span class="tag">Kişisel · MUTLU, SAĞLIKLI, SEVGİLİ</span><h3>Anlam üreten</h3><ul><li>Düşünür ve okur</li><li>Müzisyen</li><li>Doğa insanı</li><li>Aile ve ilişki rolleri</li></ul></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ kimliğin ihtiyaç duyduğu yeteneklere ayrılır</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 5</div><div class="t">Yetenekler</div><span class="ag">Yetenek ölçer</span></div>
+  <div class="cards">
+    <div class="card core"><span class="tag">Envanter</span><h3>Kimlik başına yetenek seti</h3><p>Her kimlik 3–5 çekirdek yetenekle tanımlanır. Yetenek, kimliğin ölçülebilir halidir.</p></div>
+    <div class="card core"><span class="tag">Seviye</span><h3>Evre ve kanıt</h3><p>Her yetenek çıraklık, yaratıcı-aktif veya ustalık evresindedir; seviye bir çıktıyla kanıtlanır.</p></div>
+    <div class="card core"><span class="tag">Açık</span><h3>Hedef ile mevcut arası</h3><p>Hedef kimliğin istediği ile bugünkü seviye arasındaki fark, öğrenme yolunu belirler.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ yetenek açığı öğrenme yoluna çevrilir</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 6</div><div class="t">Kişisel üniversite</div><span class="ag">Hoca</span></div>
+  <div class="cards">
+    <div class="card core"><span class="tag">Adım 1</span><h3>Müfredat</h3><p>Hedef yetkinliğe göre kavram evreninden seçilen yol haritası.</p></div>
+    <div class="card core"><span class="tag">Adım 2</span><h3>Modüller</h3><p>Okuma, özet, quiz ve uygulama birimleri; AI ile canlı çalışma.</p></div>
+    <div class="card core"><span class="tag">Adım 3</span><h3>Projeler</h3><p>Her modül bir uygulama projesiyle kapanır. Değer burada üretilir.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ proje türü, varlık sınıfı × fonksiyon matrisiyle belirlenir (aşağıda)</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 7</div><div class="t">Çıktılar</div><span class="ag">Editör · Portföy</span></div>
+  <div class="split">
+    <div class="card asset"><span class="tag">Kol 1</span><h3>Medya ve materyaller</h3><p>Kişisel markayı besler; görünürlük ve güven üretir.</p><ul><li>Metin, makale, bülten</li><li>İnfografik ve sunum</li><li>Video ve ses (Higgsfield ile AI video üretimi)</li></ul></div>
+    <div class="card asset"><span class="tag">Kol 2</span><h3>Varlık portföyü</h3><p>Gayri maddi duran varlık; kalıcı değer ve nakit akışı potansiyeli.</p><ul><li>Ajanlar ve araçlar (kod)</li><li>Metodoloji ve şablonlar</li><li>Veri setleri ve modeller</li><li>Kurslar ve ders setleri</li><li>Yetkinlik varlıkları: diploma, sertifika, lisans, akademik unvan</li></ul>
+      <div class="inner"><strong>Meridyen</strong><p>Proje finansmanı yatırım aracı ajanı. Kişisel proje, doktora birikiminden doğar; seçili modülleri şirkete aktarılır.</p></div></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ medya kolu kanala göre biçimlenir ve takvimle yayına çıkar</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 8</div><div class="t">Medya dağıtımı</div><span class="ag">Yayın planlayıcı</span></div>
+  <div class="cards">
+    <div class="card asset"><span class="tag">Profesyonel ağ</span><h3>LinkedIn</h3><p>Post, carousel, makale. Kişisel markanın ana vitrini.</p></div>
+    <div class="card asset"><span class="tag">Sahip olunan</span><h3>Bülten ve web</h3><p>Kendi abone listesi ve arşiv sitesi. Platforma bağımlı olmayan kanal.</p></div>
+    <div class="card asset"><span class="tag">Akademik</span><h3>Yayın ve kürsü</h3><p>Makale, bildiri, panel, ders. Otorite ve atıf üretir.</p></div>
+    <div class="card asset"><span class="tag">Görsel-işitsel</span><h3>Video ve ses</h3><p>YouTube, podcast, kısa video; üretimde Higgsfield. Erişimi büyütür.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ varlık kolu sürümlenir, lisanslanır ve açık depolarda yayımlanır</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 9</div><div class="t">Teknik vitrin</div><span class="ag">Depo sorumlusu</span></div>
+  <div class="cards">
+    <div class="card asset"><span class="tag">Kod</span><h3>GitHub</h3><p>Ajanlar, araçlar, şablonlar. Meridyen'in kaynak kodu ve sürümleri.</p></div>
+    <div class="card asset"><span class="tag">Model ve demo</span><h3>Hugging Face</h3><p>Veri seti, model kartı, Space demo. Araçların denenebilir yüzü.</p></div>
+    <div class="card asset"><span class="tag">Veri ve analiz</span><h3>Kaggle</h3><p>Veri seti, notebook, analiz. Veri odaklı topluluk ve görünürlük.</p></div>
+    <div class="card asset"><span class="tag">Kalıcı arşiv</span><h3>Zenodo</h3><p>DOI alan sürüm ve veri arşivi. Teknik çıktıyı akademik atıfa bağlar.</p></div>
+  </div>
+</section>
+<div class="flow"><div></div><div>↓ öğrenme kanıtlanır, kursa ve sicile dönüşür</div></div>
+
+<section class="stratum">
+  <div class="rail"><div class="n">Katman 10</div><div class="t">Eğitim ve yetkinlik</div><span class="ag">Sicil tutucu</span></div>
+  <div class="cards">
+    <div class="card asset"><span class="tag">Kurs platformları</span><h3>Udemy, Borfin, MasterClass</h3><p>Modüllerden üretilen kendi kursların. Aynı platformlar girdi tarafında öğrenme kaynağıdır.</p></div>
+    <div class="card asset"><span class="tag">Lisans ve sertifika</span><h3>SPL ve mesleki sertifikalar</h3><p>Her biri süresi, yenileme koşulu ve açtığı yetkiyle kaydedilir.</p></div>
+    <div class="card asset"><span class="tag">Akademik sicil</span><h3>Doçentlik dosyası</h3><p>Her yayın, bildiri, ders ve proje ilgili puan kategorisine bağlanır; dosya sürekli güncel kalır.</p></div>
+    <div class="card asset"><span class="tag">Kanıtlı yetkinlik</span><h3>Skillset kaydı</h3><p>Tamamlanan modül ve projeler, kanıtıyla birlikte yetkinlik olarak tutulur.</p></div>
+  </div>
+</section>
+<div class="loop">↻ Geri besleme iki yönlüdür. İçerik ve kanal verisi kavram evrenine yazılır. Teknik vitrin ve kurslardan gelen geri bildirim (issue, yorum, öğrenci sorusu, yarışma sonucu) kişisel üniversitenin modüllerine döner ve bir sonraki öğrenme döngüsünü besler.</div>
+
+<h2>Kimlik filtresi</h2>
+<p class="sub">Karışıklık aynı kavramın farklı kimlikler için farklı işe yaramasından doğar. Kimlikler dört aileye ayrılır ve her biri yaşam dikeylerinden birine bağlanır. Kavram evreniyle eşleşen her şey, öğrenme yoluna girmeden önce bir kimliğe bağlanır. Modül, proje, içerik ve varlık o kimliğin sorusuna göre şekillenir.</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Kimlik</th><th>Dikey</th><th>Ana soru</th><th>Proje ve varlık</th><th>Kanal</th><th>Sınır</th></tr></thead>
+  <tbody>
+    <tr><th>Harbiyeli ve subay<small>Kök kimlik · askeri tarih, strateji</small></th><td>BİLGE</td><td>Strateji, komuta ve çatışma bugün neyi açıklar?</td><td>Askeri tarih okuma serisi, savunma sanayii hukuku içerikleri</td><td>LinkedIn, bülten</td><td>Görev dönemine ait gizlilik yükümlülükleri</td></tr>
+    <tr><th>Uluslararası ilişkiler<small>Kök kimlik · her gün aktif</small></th><td>BİLGE</td><td>Jeopolitik ve ekonomi politik kararlarımı nasıl etkiler?</td><td>Günlük jeopolitik bülten, ülke ve politik risk modülü</td><td>Bülten, LinkedIn</td><td>Kaynak doğrulama, tarafsız analiz</td></tr>
+    <tr><th>Avukat<small>Juris</small></th><td>VARLIKLI</td><td>Müvekkile hangi riski veya çözümü getirir?</td><td>Hukuki not, kontrol listesi, sözleşme şablonu</td><td>LinkedIn, bülten</td><td>TBB reklam yasağı, sır saklama</td></tr>
+    <tr><th>Tahkim uzmanı<small>Yatırım tahkimi</small></th><td>VARLIKLI</td><td>Uyuşmazlık nasıl önlenir veya çözülür?</td><td>Karar analizleri, tahkim bülteni, Meridyen risk modülü</td><td>Akademik, LinkedIn</td><td>Dosya gizliliği</td></tr>
+    <tr><th>Danışman ve mentor<small>Onscala, FleetMole</small></th><td>VARLIKLI</td><td>Hangi karar için çerçeve olur?</td><td>Çerçeve, rapor şablonu, kurumsal yönetim paneli</td><td>Web, GitHub, kurs</td><td>Çıkar çatışması</td></tr>
+    <tr><th>Yönetim kurulu üyesi</th><td>VARLIKLI</td><td>Hangi yönetişim ve risk sorusuna cevap verir?</td><td>Risk paneli, yönetişim çerçevesi, SPL gibi lisanslar</td><td>Kapalı rapor, seçili konuşma</td><td>Gizlilik, içeriden bilgi</td></tr>
+    <tr><th>Performans pazarlamacı<small>Meta, Google, Amazon, Pinterest</small></th><td>VARLIKLI</td><td>Hangi kanal, hangi maliyetle büyütür?</td><td>Reklam playbook'u, performans paneli</td><td>Kurs, LinkedIn</td><td>Müşteri verisi gizliliği</td></tr>
+    <tr><th>Seri girişimci<small>FevUp, Marqby, STANDIO, TOVU</small></th><td>VARLIKLI</td><td>Hangi problem ölçeklenebilir bir işe dönüşür?</td><td>İş modeli, MVP, yatırımcı sunumu</td><td>LinkedIn, GitHub</td><td>Yatırımcı sözleşmeleri, rekabet yasağı</td></tr>
+    <tr><th>E-ihracatçı<small>FevUp, D2X, EuroStep</small></th><td>VARLIKLI</td><td>Hangi ürün, pazar ve büyüme kaldıracı?</td><td>Operasyon paneli, pazar analizi, teşvik yol haritası</td><td>LinkedIn, Kaggle</td><td>Rekabet yasağı alanları</td></tr>
+    <tr><th>Yatırımcı<small>MTFG, fon portföyü</small></th><td>VARLIKLI</td><td>Nakit akışı mı, değer mi, risk ne?</td><td>Portföy paneli, trading ajanları, Meridyen</td><td>Kapalı panel, seçili içerik</td><td>Kişiye özel yatırım tavsiyesi yok (SPK)</td></tr>
+    <tr><th>AI sistem mimarı<small>Commerce Engine, JCE, Vibe Management</small></th><td>VARLIKLI</td><td>Hangi süreç ajanla otomatikleşir?</td><td>Ajanlar, MCP sunucuları, şablonlar</td><td>GitHub, Hugging Face</td><td>Veri güvenliği, KVKK</td></tr>
+    <tr><th>Akademisyen<small>Doktora, doçentlik hedefi</small></th><td>BİLGE</td><td>Bunu yayımlayabilir, öğretebilir miyim?</td><td>Makale, bildiri, ders seti, doçentlik sicili</td><td>Akademik yayın, Zenodo</td><td>Bilimsel etik, atıf kuralları</td></tr>
+    <tr><th>Araştırmacı-yazar<small>Hukuk ve Sinema, Türkiye 3X</small></th><td>BİLGE</td><td>Hangi fikir kalıcı metne dönüşür?</td><td>Makale serisi, kitap taslağı</td><td>LinkedIn, web, bülten</td><td>Telif ve alıntı kuralları</td></tr>
+    <tr><th>Konuşmacı ve panelist<small>COP31, girişim sunumları</small></th><td>BİLGE</td><td>Bu fikir sahnede nasıl anlatılır?</td><td>Sunum, bildiri, panel notu</td><td>Etkinlik, video</td><td>Kurum adına konuşma sınırı</td></tr>
+    <tr><th>Eğitmen<small>Udemy, Borfin, MasterClass</small></th><td>BİLGE</td><td>Kim, neyi, hangi sırayla öğrenecek?</td><td>Kurs, ders seti, sınav hazırlık modülü</td><td>Kurs platformları</td><td>Meslek kuralları, telif</td></tr>
+    <tr><th>Düşünür ve okur<small>Felsefe, sanat tarihi, politik ekonomi</small></th><td>BİLGE</td><td>Bu beni nasıl dönüştürür?</td><td>Okuma notları, disiplinlerarası müfredat</td><td>Özel arşiv, seçili deneme</td><td>Mahremiyet</td></tr>
+    <tr><th>Müzisyen<small>Loop tabanlı prodüksiyon</small></th><td>MUTLU</td><td>Ne yaratmak istiyorum?</td><td>Parçalar, setler, ses arşivi</td><td>Kişisel kanal</td><td>Telif</td></tr>
+    <tr><th>Doğa insanı<small>Outdoor, kamp</small></th><td>SAĞLIKLI</td><td>Nasıl dinç ve dengede kalırım?</td><td>Rota ve ekipman notları</td><td>Kişisel</td><td>Mahremiyet</td></tr>
+    <tr><th>Aile ve ilişki rolleri</th><td>SEVGİLİ</td><td>Sen tanımlarsın</td><td>Sen tanımlarsın</td><td>Kişisel</td><td>Mahremiyet</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="cards" style="margin-top:12px">
+  <div class="card in"><span class="tag">Etiket kuralı</span><h3>Bir birincil kimlik</h3><p>Her kayıt tek bir birincil kimlik taşır, en fazla bir ikincil kimlik eklenebilir. Kimliği belirsiz kayıt kavram evreninde kalır, öğrenme yoluna ve üretime girmez.</p></div>
+  <div class="card in"><span class="tag">Örnek</span><h3>Aynı kavram, üç iş</h3><p>“Proje finansmanı riski” akademisyen için tez bölümü, avukat için sözleşme kontrol listesi, danışman için Meridyen ajanıdır.</p></div>
+</div>
+
+<h2>Yetenek haritası</h2>
+<p class="sub">Her kimliğin çekirdek yetenekleri. Öğrenme bu yetenekleri büyütür, projeler kanıtlar. İlk öneridir; sen ekler veya çıkarırsın.</p>
+<div class="tablewrap">
+<table class="narrow">
+  <thead><tr><th>Kimlik</th><th>Çekirdek yetenekler</th></tr></thead>
+  <tbody>
+    <tr><th>Harbiyeli ve subay</th><td>Strateji ve harekât düşüncesi · liderlik ve komuta · kriz yönetimi</td></tr>
+    <tr><th>Uluslararası ilişkiler</th><td>Jeopolitik analiz · ekonomi politik okuma · senaryo planlama</td></tr>
+    <tr><th>Avukat</th><td>Sözleşme tasarımı · uyuşmazlık stratejisi · mevzuat takibi</td></tr>
+    <tr><th>Tahkim uzmanı</th><td>Yatırım antlaşması analizi · tahkim usulü · delil ve dilekçe kurgusu</td></tr>
+    <tr><th>Danışman ve mentor</th><td>Problem çerçeveleme · finansal analiz · ikna edici sunum</td></tr>
+    <tr><th>Yönetim kurulu üyesi</th><td>Finansal tablo okuma · risk ve iç kontrol · kurumsal yönetim ilkeleri</td></tr>
+    <tr><th>Performans pazarlamacı</th><td>Kampanya mimarisi · ölçümleme · kreatif test</td></tr>
+    <tr><th>Seri girişimci</th><td>İş modeli tasarımı · fon toplama · ekip kurma</td></tr>
+    <tr><th>E-ihracatçı</th><td>Pazar araştırması · lojistik ve gümrük · teşvik yönetimi</td></tr>
+    <tr><th>Yatırımcı</th><td>Değerleme · portföy ve risk yönetimi · sermaye piyasası mevzuatı</td></tr>
+    <tr><th>AI sistem mimarı</th><td>Ajan tasarımı · veri yönetimi · değerlendirme ve test</td></tr>
+    <tr><th>Akademisyen</th><td>Araştırma yöntemi · akademik yazım · literatür yönetimi</td></tr>
+    <tr><th>Araştırmacı-yazar</th><td>Anlatı kurma · editörlük · seri planlama</td></tr>
+    <tr><th>Konuşmacı ve panelist</th><td>Hikaye anlatımı · sahne hakimiyeti · soru-cevap yönetimi</td></tr>
+    <tr><th>Eğitmen</th><td>Öğretim tasarımı · video üretimi · ölçme ve değerlendirme</td></tr>
+    <tr><th>Düşünür ve okur</th><td>Derin okuma · sentez · karşılaştırmalı analiz</td></tr>
+    <tr><th>Müzisyen</th><td>Loop prodüksiyonu · armoni · ses tasarımı</td></tr>
+    <tr><th>Doğa insanı</th><td>Rota planlama · dayanıklılık · ekipman bilgisi</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Dönüşüm hikayesi: iki örnek</h2>
+<p class="sub">Her proje aynı kartla tanımlanır. Bir halkası boş kalan proje başlamaz.</p>
+<div class="split">
+  <div class="card"><span class="tag">Hikaye kartı</span><h3>Meridyen</h3><dl class="story">
+    <dt>Kavram</dt><dd>Proje finansmanı riski, politik risk</dd>
+    <dt>Kimlik</dt><dd>Danışman (birincil), tahkim uzmanı</dd>
+    <dt>Yetenek</dt><dd>Risk analizi, finansal modelleme, ajan tasarımı</dd>
+    <dt>Öğrenme</dt><dd>Proje finansmanı modülü, ajan geliştirme modülü</dd>
+    <dt>Proje</dt><dd>Meridyen v1 ve politik risk modülü</dd>
+    <dt>Varlık</dt><dd>Kişisel IP (GitHub, Hugging Face), makale, kurs; seçili modüller şirkete</dd>
+  </dl></div>
+  <div class="card"><span class="tag">Hikaye kartı</span><h3>Savunma sanayii hukuku</h3><dl class="story">
+    <dt>Kavram</dt><dd>İhracat kontrolü, offset, savunma tedariki</dd>
+    <dt>Kimlik</dt><dd>Avukat (birincil), subay</dd>
+    <dt>Yetenek</dt><dd>İhracat kontrol mevzuatı, sözleşme müzakeresi</dd>
+    <dt>Öğrenme</dt><dd>İhracat kontrolü ve tedarik sözleşmeleri modülü</dd>
+    <dt>Proje</dt><dd>Uyum kontrol listesi ve LinkedIn yazı serisi</dd>
+    <dt>Varlık</dt><dd>Metodoloji (IP), uzmanlık itibarı, Juris hizmet hattı</dd>
+  </dl></div>
+</div>
+
+<h2>Kimliklerin zaman ekseni</h2>
+<p class="sub">Kimlik yalnızca bugünkü rol değildir. Geçmiş kimlikler birikim bırakır, güncel kimlikler onu kullanır, hedef kimlikler yön verir.</p>
+<div class="cards">
+  <div class="card"><span class="tag">Kök · geçmiş</span><h3>Birikim bırakanlar</h3><p>Harbiyelilik, yıllarca subaylık, uluslararası ilişkiler eğitimi. Rol bitmiş olabilir, ilgi ve bakış açısı sürüyor.</p></div>
+  <div class="card"><span class="tag">Güncel · aktif</span><h3>Birikimi kullananlar</h3><p>Avukat, tahkim uzmanı, girişimci, yatırımcı, yönetim kurulu üyesi ve diğerleri. Bugün gelir ve değer üretenler.</p></div>
+  <div class="card"><span class="tag">Hedef · gelecek</span><h3>Yön verenler</h3><p>Doçent, kurs eğitmeni ve senin ekleyeceğin hedefler. Öğrenme yolu bunlara doğru kurulur.</p></div>
+</div>
+
+<h2>Sinerji kesişimleri</h2>
+<p class="sub">Kaldıraç burada oluşur: birden fazla kimliğin birikimi tek bir alanda buluşur ve kimsenin kolay kopyalayamayacağı bir uzmanlık çıkar. Aşağıdakiler ilk hipotezlerdir.</p>
+<div class="cards">
+  <div class="card asset"><span class="tag">Subay + uluslararası ilişkiler + avukat</span><h3>Savunma sanayii hukuku</h3><p>Juris'in uzmanlık alanı, Onscala danışmanlığı ve askeri tarih içerikleri aynı kökten beslenir.</p></div>
+  <div class="card asset"><span class="tag">Uluslararası ilişkiler + tahkim + akademisyen</span><h3>Yatırım tahkimi ve jeopolitik</h3><p>Devlet–yatırımcı uyuşmazlıklarını siyasi bağlamıyla okumak tezi ve tahkim pratiğini ayırt edici kılar.</p></div>
+  <div class="card asset"><span class="tag">Uluslararası ilişkiler + yatırımcı + Meridyen</span><h3>Politik risk modülü</h3><p>Günlük jeopolitik takip, proje finansmanı değerlendirmesinde ülke riski katmanına dönüşür.</p></div>
+  <div class="card asset"><span class="tag">Ekonomi politik + e-ihracatçı</span><h3>Pazar ve ticaret politikası</h3><p>Hedef pazar seçimi, gümrük ve teşvik okuması, EuroStep ve D2X kararlarını besler.</p></div>
+  <div class="card asset"><span class="tag">Subay + yönetim kurulu üyesi</span><h3>Kriz ve yönetişim</h3><p>Komuta, disiplin ve kriz yönetimi deneyimi, kurumsal yönetim ve risk çerçevelerine aktarılır.</p></div>
+</div>
+
+<h2>Günlük disiplin</h2>
+<p class="sub">Sinerji kendiliğinden oluşuyor; sistem onu tesadüften çıkarıp düzenli hale getirir. Ritimler başlangıç önerisidir.</p>
+<div class="cards">
+  <div class="card"><span class="tag">Günlük</span><h3>Oku ve kart çıkar</h3><p>Jeopolitik, ekonomi ve hukuk okuması kalemle yapılır. Bekleme süresi dolan işaretlerden kart çıkarılır, her kart bir kimliğe bağlanır.</p></div>
+  <div class="card"><span class="tag">Haftalık</span><h3>Bülten ve modül</h3><p>Haftanın notları bültene döner, bir modül ilerler, kesişen kimlikler işaretlenir.</p></div>
+  <div class="card"><span class="tag">Aylık</span><h3>Çıktı</h3><p>En az bir içerik serisi ve bir proje adımı yayına çıkar.</p></div>
+  <div class="card"><span class="tag">Çeyreklik</span><h3>Kimlik muhasebesi</h3><p>Hangi kimlik büyüdü, hangisi ihmal edildi, hangi kesişim değer üretti?</p></div>
+</div>
+
+<h2>Greene–Holiday yöntemi</h2>
+<p class="sub">Robert Greene'in not kartı sistemi (dijital uyarlamayla) ve ustalık evreleri, Ryan Holiday'in kalıcı eser ve sade çıktı anlayışı ekosistemin iki ucunu sabitler: neyin, nasıl edinileceğini ve neyin, ne kadar sade üretileceğini.</p>
+
+<h3 class="h3">Edinim: kart sistemi</h3>
+<div class="steps">
+  <div class="step"><span class="sn">1</span><div><b>Kalemle oku.</b> Kitabı işaretle, ama okurken not çıkarma. Okuma akışı bozulmasın.</div></div>
+  <div class="step"><span class="sn">2</span><div><b>Beklet.</b> Bir iki hafta sonra işaretlere dön. Hala önemli görünen önemlidir.</div></div>
+  <div class="step"><span class="sn">3</span><div><b>Karta aktar.</b> Tek fikir, kendi cümlelerinle. Etiketler: tema, kimlik, kişisel veya şirket.</div></div>
+  <div class="step"><span class="sn">4</span><div><b>Koleksiyona bağla.</b> Kartlar dijital tema koleksiyonlarına bağlanır. Koleksiyonlar kavram evreninin düğümleridir.</div></div>
+  <div class="step"><span class="sn">5</span><div><b>Koleksiyondan yaz.</b> Bir koleksiyon olgunlaştığında içerik ya da proje ondan derlenir. Boş sayfadan yazılmaz.</div></div>
+</div>
+
+<h3 class="h3">Ustalık evreleri</h3>
+<p class="sub">Greene'e göre ustalık üç evreden geçer ve en güçlü ustalık birden fazla becerinin birleşiminden doğar. Her kimlik bu evrelerden birindedir; sinerji kesişimleri senin hibrit ustalık alanlarındır. Yerleştirmeler ilk öneridir, sen düzeltirsin.</p>
+<div class="cards">
+  <div class="card"><span class="tag">Evre 1</span><h3>Çıraklık</h3><p>Gözlem, temel beceri, çok deneme. Ego geri planda.</p><ul><li>Eğitmen</li><li>Müzisyen</li></ul></div>
+  <div class="card"><span class="tag">Evre 2</span><h3>Yaratıcı-aktif</h3><p>Kuralları bilip kendi yolunu üretmek, ilk özgün eserler.</p><ul><li>Akademisyen (doktora)</li><li>AI sistem mimarı</li><li>Araştırmacı-yazar</li></ul></div>
+  <div class="card"><span class="tag">Evre 3</span><h3>Ustalık</h3><p>Sezgi ile bilginin birleşmesi; alanını bütün olarak görmek.</p><ul><li>Avukat</li><li>Performans pazarlamacı</li><li>Girişimci</li></ul></div>
+  <div class="card core"><span class="tag">Hibrit</span><h3>Hayatın işi</h3><p>Kök kimliklerdeki erken eğilimler ile bugünkü ustalıkların kesişimi. Savunma sanayii hukuku ve politik risk bunun ilk adayları.</p></div>
+</div>
+
+<h3 class="h3">Çıktı sadeliği: çıktı merdiveni</h3>
+<p class="sub">Holiday'in yaklaşımı: az ama kalıcı üret, sahip olduğun kanalda biriktir. Her basamak bir öncekinin birikimiyle kurulur; yeni format icat edilmez.</p>
+<div class="steps">
+  <div class="step"><span class="sn">1</span><div><b>Kart.</b> Tek fikir. Ham madde.</div></div>
+  <div class="step"><span class="sn">2</span><div><b>Günün kartı.</b> Bir fikir, bir sayfa, bir paylaşım. LinkedIn'de kısa yazı.</div></div>
+  <div class="step"><span class="sn">3</span><div><b>Haftalık bülten.</b> Haftanın en iyi kartları ve aylık okuma listesi. Sahip olunan kanal.</div></div>
+  <div class="step"><span class="sn">4</span><div><b>Seri ve makale.</b> Bir tema koleksiyonu olgunlaşınca uzun metin, akademik yayın ya da proje.</div></div>
+  <div class="step"><span class="sn">5</span><div><b>Kitap, kurs, araç.</b> Olgun koleksiyonlar kalıcı varlığa dönüşür; portföye girer.</div></div>
+</div>
+<div class="cards" style="margin-top:12px">
+  <div class="card in"><span class="tag">İlke</span><h3>Kalıcı olan önce</h3><p>Gündem içeriği yerine yıllar sonra da okunacak fikir seçilir. Gündem, kalıcı fikre giriş kapısı olarak kullanılır.</p></div>
+  <div class="card in"><span class="tag">İlke</span><h3>Tek içerik, tek fikir</h3><p>Bir içerik bir şey söyler. Fazlası ayrı kart, ayrı içerik olur.</p></div>
+  <div class="card in"><span class="tag">İlke</span><h3>Tuval stratejisi</h3><p>Önce okura fayda: bilgilendir, yol göster, kendini öne çıkarma. Avukatlık kurallarıyla da örtüşür.</p></div>
+  <div class="card in"><span class="tag">İlke</span><h3>Sahip olunan kanal</h3><p>Platformlar değişir; bülten listesi ve web arşivi sende kalır.</p></div>
+</div>
+
+<h2>Proje üretici</h2>
+<p class="sub">Satırlarda varlık sınıfları, üst yatayda kişisel ve şirket perspektifi var. Her proje, şirket haritasındaki bir fonksiyonla etiketlenir. Hücreler örnektir; v1'de 80/20 ile birkaçı seçilir.</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Varlık sınıfı</th><th class="grp">Kişisel</th><th class="grp">Şirket</th></tr></thead>
+  <tbody>
+    <tr><th>Dönen<small>Nakit, menkul kıymet</small></th><td><ul class="pl"><li><span class="fn">Finans</span>Kişisel bilanço ve nakit akışı paneli</li><li><span class="fn">Marka</span>Nakit yönetimi içerik serisi</li></ul></td><td><ul class="pl"><li><span class="fn">Finans</span>Nakit akım tahmin paneli</li><li><span class="fn">Satış</span>Alacak ve tahsilat takip ajanı</li><li><span class="fn">Operasyon</span>Bütçe–gerçekleşen izleme</li></ul></td></tr>
+    <tr><th>Maddi<small>Ev, arsa, araç, makine</small></th><td><ul class="pl"><li><span class="fn">Finans</span>Gayrimenkul getiri analizörü</li><li><span class="fn">Marka</span>Koleksiyon ve sanat kataloğu</li><li><span class="fn">Satış</span>Varlık satış değerleme aracı</li></ul></td><td><ul class="pl"><li><span class="fn">Finans</span>CAPEX yatırım değerlendirme aracı</li><li><span class="fn">Operasyon</span>Demirbaş ve amortisman envanteri</li></ul></td></tr>
+    <tr><th>Finansal<small>Ortaklık, BES, tahvil</small></th><td><ul class="pl"><li class="hl"><span class="fn">Finans</span>Meridyen: proje finansmanı yatırım aracı ajanı</li><li><span class="fn">Finans</span>Ortaklık payı ve BES izleme</li><li><span class="fn">Marka</span>Yatırım tahkimi bülteni</li></ul></td><td><ul class="pl"><li><span class="fn">Finans</span>Meridyen modülleri (kişisel projeden aktarılan)</li><li><span class="fn">Satış</span>Yatırımcı sunumu üretici</li><li><span class="fn">Operasyon</span>İştirak ve ortaklık yapısı haritası</li></ul></td></tr>
+    <tr><th>Gayri maddi<small>Marka, patent, telif, alan adı</small></th><td><ul class="pl"><li><span class="fn">Finans</span>Kişisel IP envanteri ve değer kaydı</li><li><span class="fn">Marka</span>Kişisel marka ve telif arşivi</li><li><span class="fn">Operasyon</span>Alan adı ve telif yenileme takvimi</li></ul></td><td><ul class="pl"><li><span class="fn">Operasyon</span>Portföy şirketlerinin IP envanteri</li><li><span class="fn">Satış</span>Lisanslama teklif şablonları</li></ul></td></tr>
+    <tr><th>Entelektüel<small>Yetkinlik, sertifika, unvan</small></th><td><ul class="pl"><li><span class="fn">Finans</span>SPL ve lisans hazırlık modülleri</li><li><span class="fn">Marka</span>Uzman profili ve yetkinlik portfolyosu</li><li><span class="fn">Operasyon</span>Sertifika yenileme ve doçentlik puan sicili</li></ul></td><td><ul class="pl"><li><span class="fn">Operasyon</span>Ekip yetkinlik matrisi</li><li><span class="fn">Satış</span>Kurumsal eğitim ve danışmanlık paketleri</li></ul></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Dağıtım kanalları ve içerik türleri</h2>
+<p class="sub">Aynı metin her kanala farklı biçimde gider. Ritim sütunu başlangıç önerisidir; kanal verisi geldikçe ayarlanır.</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Kanal</th><th>İçerik türleri</th><th>Rolü</th><th>DIKW seviyesi</th><th>Önerilen ritim</th></tr></thead>
+  <tbody>
+    <tr><th>LinkedIn<small>Kişisel profil</small></th><td>Günün kartı, carousel, uzun makale, seri (ör. Hukuk ve Sinema)</td><td>Görünürlük, ağ, güven</td><td>Bilgi → bilgelik</td><td>Haftada 2–3</td></tr>
+    <tr><th>Bülten<small>Sahip olunan liste</small></th><td>Haftanın kartları, aylık okuma listesi, proje güncellemesi</td><td>Sadık okur, platform bağımsızlığı</td><td>Bilgi → anlayış</td><td>İki haftada 1</td></tr>
+    <tr><th>Web arşivi<small>Kişisel site</small></th><td>Kalıcı makaleler, kavram sayfaları, portföy vitrini</td><td>Arama görünürlüğü, referans</td><td>Anlayış</td><td>Bültenle eşzamanlı</td></tr>
+    <tr><th>Akademik<small>Dergi, kongre, kürsü</small></th><td>Makale, bildiri, panel sunumu, ders slaytı</td><td>Otorite ve atıf</td><td>Bilgelik</td><td>Dönemlik</td></tr>
+    <tr><th>Video ve ses<small>YouTube, podcast</small></th><td>Kısa açıklayıcı video, uzun söyleşi, canlı ders kaydı</td><td>Erişim ve tanınırlık</td><td>Bilgi → anlayış</td><td>Ayda 2</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Teknik vitrin platformları</h2>
+<p class="sub">Medya kanallarından ayrı çalışır. Burada yayımlanan her şey portföydeki bir varlığa bağlıdır ve sürüm, lisans ve dökümantasyon taşır.</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Platform</th><th>Yayımlanan</th><th>Rolü</th><th>Bağlı varlık türü</th><th>Tetikleyici</th></tr></thead>
+  <tbody>
+    <tr><th>GitHub<small>Kod deposu</small></th><td>Ajan kodu, araçlar, şablonlar, README</td><td>Kaynak ve sürüm takibi</td><td>Ajanlar ve araçlar</td><td>Her sürüm</td></tr>
+    <tr><th>Hugging Face<small>Model ve demo</small></th><td>Veri seti, model kartı, Space demosu</td><td>Denenebilir vitrin</td><td>Modeller, demolar</td><td>Demo hazır olduğunda</td></tr>
+    <tr><th>Kaggle<small>Veri topluluğu</small></th><td>Veri seti, notebook, analiz</td><td>Veri görünürlüğü</td><td>Veri setleri</td><td>Veri seti yayımında</td></tr>
+    <tr><th>Zenodo<small>Kalıcı arşiv</small></th><td>DOI'li sürüm ve veri kopyası</td><td>Akademik atıf</td><td>Tüm teknik varlıklar</td><td>Ana sürümlerde</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Entelektüel varlık sicili</h2>
+<p class="sub">Yetkinlikler muhasebe bilançosunda görünmez, ama kişisel bilançoda ayrı bir varlık sınıfı olarak izlenir: yetki açar, ücret ve unvan üretir. Doçentlik dosyası gibi, her kayıt kanıtıyla tutulur.</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Varlık türü</th><th>Örnek</th><th>Kanıt</th><th>Takip</th><th>Değere dönüşüm</th></tr></thead>
+  <tbody>
+    <tr><th>Diploma ve unvan<small>Akademik</small></th><td>Doktora, doçentlik hedefi</td><td>Diploma, jüri kararları</td><td>Doçentlik puan kategorileri</td><td>Kadro, ders, hakemlik</td></tr>
+    <tr><th>Lisans<small>Düzenlenmiş yetki</small></th><td>SPL ve benzeri mesleki lisanslar</td><td>Lisans belgesi, sınav sonucu</td><td>Süre ve yenileme koşulu</td><td>Yeni hizmet alanı, yetkili rol</td></tr>
+    <tr><th>Sertifika<small>Mesleki ve platform</small></th><td>Hakemlik, uyum, teknik sertifikalar</td><td>Sertifika ve doğrulama bağlantısı</td><td>Geçerlilik tarihi</td><td>Güven, teklif gücü</td></tr>
+    <tr><th>Kurs<small>Kendi üretimin</small></th><td>Udemy, Borfin, MasterClass dersleri</td><td>Yayın sayfası, öğrenci verisi</td><td>Güncelleme döngüsü</td><td>Pasif gelir, erişim</td></tr>
+    <tr><th>Yayın sicili<small>Akademik çıktı</small></th><td>Makale, bildiri, kitap bölümü</td><td>DOI, yayın kaydı</td><td>Atıf ve puan</td><td>Otorite, doçentlik dosyası</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>İçerik kapsamı</h2>
+<p class="sub">Konular üç halkada durur. İç halka otoriteyi, dış halkalar erişimi büyütür. Oranlar başlangıç önerisidir.</p>
+<div class="cards">
+  <div class="card core"><span class="tag">Çekirdek · ~%60</span><h3>Uzmanlık alanı</h3><ul><li>Proje finansmanı ve yatırım tahkimi</li><li>Teknoloji, yapay zekâ ve fintech hukuku</li><li>Kalkınma hukuku, Türkiye 3X</li></ul></div>
+  <div class="card"><span class="tag">Komşu · ~%30</span><h3>Uygulama alanı</h3><ul><li>Girişimcilik ve yatırımcılık</li><li>E-ticaret, e-ihracat, marka</li><li>Varlık yönetimi ve kişisel bilanço</li></ul></div>
+  <div class="card"><span class="tag">Geniş · ~%10</span><h3>Düşünce alanı</h3><ul><li>Hukuk ve sinema</li><li>Öğrenme sistemleri, kişisel üniversite</li><li>Okuma notları ve kitap değerlendirmeleri</li></ul></div>
+  <div class="card in"><span class="tag">Sınırlar</span><h3>Uyum kuralları</h3><ul><li>Avukat kimliğiyle içerik bilgilendirici kalır; iş çağrısı yapmaz (TBB reklam yasağı)</li><li>Rekabet yasağı olan alanlarda içerik düşünce liderliğiyle sınırlı kalır, rakip ticari teklif içermez</li><li>Alıntılar kısa ve kaynak gösterilerek kullanılır</li></ul></div>
+</div>
+
+<h2>Ajan kadrosu</h2>
+<p class="sub">Her ajan tek bir katmanın sahibidir. İnsan karar verir; ajan hazırlar, sınıflar ve önerir.</p>
+<div class="agents">
+  <div class="card"><span class="tag">Katman 0</span><h3>Kütüphaneci</h3><p>Fiziksel kitapları ISBN ile kataloglar, dijital arşivleri tarar, tekrarları ayıklar.</p></div>
+  <div class="card"><span class="tag">Katman 1</span><h3>Bültenci</h3><p>Periyodik bülteni hazırlar: yeni kaynak, özet, öne çıkan kavram.</p></div>
+  <div class="card"><span class="tag">Katman 2–3</span><h3>Haritacı</h3><p>Her kaydı dört haritada konumlar ve kavram evrenine bağlar.</p></div>
+  <div class="card"><span class="tag">Katman 4</span><h3>Kimlik yönlendirici</h3><p>Her kavram eşleşmesine, modüle ve projeye bir birincil kimlik atar; kimliği belirsiz kaydı öğrenme yoluna sokmaz, sana sorar.</p></div>
+  <div class="card"><span class="tag">Katman 5</span><h3>Yetenek ölçer</h3><p>Her kimliğin yeteneklerini, evresini ve açığını tutar; projelerin hangi yeteneği büyüttüğünü kanıtıyla kaydeder.</p></div>
+  <div class="card"><span class="tag">Katman 6</span><h3>Hoca</h3><p>Müfredat ve modül kurar, quiz yapar, ilerlemeyi ve skillset'i izler.</p></div>
+  <div class="card"><span class="tag">Matris</span><h3>Proje mimarı</h3><p>Varlık × fonksiyon kesişiminden proje fikri üretir ve kapsamını çizer.</p></div>
+  <div class="card"><span class="tag">Katman 7</span><h3>Editör</h3><p>Metni infografik, sunum ve videoya çevirir; meslek kurallarına uyumu kontrol eder.</p></div>
+  <div class="card"><span class="tag">Katman 8</span><h3>Yayın planlayıcı</h3><p>İçeriği kanala göre biçimler, yayın takvimini kurar, kanal performansını kavram evrenine geri yazar.</p></div>
+  <div class="card"><span class="tag">Katman 9</span><h3>Depo sorumlusu</h3><p>Varlıkları sürümler, lisans ve README ekler, GitHub, Hugging Face, Kaggle ve Zenodo'da eşzamanlı yayımlar.</p></div>
+  <div class="card"><span class="tag">Katman 10</span><h3>Sicil tutucu</h3><p>Sertifika, lisans ve yayınları kanıtıyla kaydeder, yenileme tarihlerini izler, doçentlik dosyasını güncel tutar.</p></div>
+  <div class="card"><span class="tag">Katman 7</span><h3>Portföy yöneticisi</h3><p>Üretilen araç ve IP'leri envantere alır; nakit akışı ve değerleme katkısını izler.</p></div>
+</div>
+
+<h2>Altyapı</h2>
+<div class="cards">
+  <div class="card"><h3>Kavram evreni</h3><p>Obsidian Master, BİLGE dikeyi. Kavram notları ve bağlantılar.</p></div>
+  <div class="card"><h3>Ham depo</h3><p>Drive, masaüstü, eski disk. Dosyalar yerinde kalır, kasa onlara bağlanır.</p></div>
+  <div class="card"><h3>Fiziksel köprü</h3><p>ISBN kataloğu ve not fotoğrafları. Kitabın tamamı değil, işaretlenen kısmı dijitale geçer.</p></div>
+  <div class="card"><h3>Yayın</h3><p>Medya için LinkedIn, bülten ve web; teknik varlıklar için GitHub, Hugging Face, Kaggle ve Zenodo.</p></div>
+</div>
+
+<h2>Netleşecek kararlar</h2>
+<ul class="qs">
+  <li><b>Varlık portföyünün kapsamı.</b> Yalnızca yazılım ve ajanlar mı, yoksa kitap, kurs ve metodoloji de aynı rafta mı?</li>
+  <li><b>v1 sınırı.</b> Hangi harita ve hangi müfredatla başlanacak? Doktora ve proje finansmanı en güçlü aday.</li>
+  <li><b>Kimlik listesi.</b> Eklenecek, birleştirilecek veya çıkarılacak kimlikler ve her kimliğin birincil dikeyi.</li>
+  <li><b>Meridyen kapsamı.</b> Hedef kullanıcı, girdi verisi ve ürettiği karar çıktısı.</li>
+</ul>
+</div>

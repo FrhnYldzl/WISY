@@ -1,0 +1,456 @@
+{
+  "urun": "Wisy",
+  "alt_baslik": "Kişisel Vibe Management",
+  "ana_hikaye": [
+    "Kavramlar",
+    "Kimlikler",
+    "Yetenekler",
+    "Öğrenme",
+    "Projeler",
+    "Varlıklar"
+  ],
+  "kimlikler": [
+    {
+      "slug": "harbiyeli-ve-subay",
+      "ad": "Harbiyeli ve subay",
+      "aile": "kok",
+      "dikey": "BILGE",
+      "zaman": "kok",
+      "baglam": "Askeri tarih, strateji",
+      "ana_soru": "Strateji, komuta ve çatışma bugün neyi açıklar?",
+      "kanal": "LinkedIn, bülten",
+      "sinir": "Görev dönemine ait gizlilik yükümlülükleri",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Strateji ve harekât düşüncesi",
+        "Liderlik ve komuta",
+        "Kriz yönetimi"
+      ]
+    },
+    {
+      "slug": "uluslararasi-iliskiler",
+      "ad": "Uluslararası ilişkiler",
+      "aile": "kok",
+      "dikey": "BILGE",
+      "zaman": "kok",
+      "baglam": "Her gün aktif: jeopolitik, dış politika, ekonomi politik",
+      "ana_soru": "Jeopolitik ve ekonomi politik kararlarımı nasıl etkiler?",
+      "kanal": "Bülten, LinkedIn",
+      "sinir": "Kaynak doğrulama, tarafsız analiz",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Jeopolitik analiz",
+        "Ekonomi politik okuma",
+        "Senaryo planlama"
+      ]
+    },
+    {
+      "slug": "avukat",
+      "ad": "Avukat",
+      "aile": "mesleki",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Juris",
+      "ana_soru": "Müvekkile hangi riski veya çözümü getirir?",
+      "kanal": "LinkedIn, bülten",
+      "sinir": "TBB reklam yasağı, sır saklama",
+      "evre": "usta",
+      "yetenekler": [
+        "Sözleşme tasarımı",
+        "Uyuşmazlık stratejisi",
+        "Mevzuat takibi"
+      ]
+    },
+    {
+      "slug": "tahkim-uzmani",
+      "ad": "Tahkim uzmanı",
+      "aile": "mesleki",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Yatırım tahkimi",
+      "ana_soru": "Uyuşmazlık nasıl önlenir veya çözülür?",
+      "kanal": "Akademik, LinkedIn",
+      "sinir": "Dosya gizliliği",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Yatırım antlaşması analizi",
+        "Tahkim usulü",
+        "Delil ve dilekçe kurgusu"
+      ]
+    },
+    {
+      "slug": "danisman-ve-mentor",
+      "ad": "Danışman ve mentor",
+      "aile": "mesleki",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Onscala, FleetMole",
+      "ana_soru": "Hangi karar için çerçeve olur?",
+      "kanal": "Web, GitHub, kurs",
+      "sinir": "Çıkar çatışması",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Problem çerçeveleme",
+        "Finansal analiz",
+        "İkna edici sunum"
+      ]
+    },
+    {
+      "slug": "yonetim-kurulu-uyesi",
+      "ad": "Yönetim kurulu üyesi",
+      "aile": "mesleki",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Kurumsal yönetim",
+      "ana_soru": "Hangi yönetişim ve risk sorusuna cevap verir?",
+      "kanal": "Kapalı rapor, seçili konuşma",
+      "sinir": "Gizlilik, içeriden bilgi",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Finansal tablo okuma",
+        "Risk ve iç kontrol",
+        "Kurumsal yönetim ilkeleri"
+      ]
+    },
+    {
+      "slug": "performans-pazarlamaci",
+      "ad": "Performans pazarlamacı",
+      "aile": "mesleki",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Meta, Google, Amazon, Pinterest",
+      "ana_soru": "Hangi kanal, hangi maliyetle büyütür?",
+      "kanal": "Kurs, LinkedIn",
+      "sinir": "Müşteri verisi gizliliği",
+      "evre": "usta",
+      "yetenekler": [
+        "Kampanya mimarisi",
+        "Ölçümleme",
+        "Kreatif test"
+      ]
+    },
+    {
+      "slug": "seri-girisimci",
+      "ad": "Seri girişimci",
+      "aile": "kurucu",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "FevUp, Marqby, STANDIO, TOVU",
+      "ana_soru": "Hangi problem ölçeklenebilir bir işe dönüşür?",
+      "kanal": "LinkedIn, GitHub",
+      "sinir": "Yatırımcı sözleşmeleri, rekabet yasağı",
+      "evre": "usta",
+      "yetenekler": [
+        "İş modeli tasarımı",
+        "Fon toplama",
+        "Ekip kurma"
+      ]
+    },
+    {
+      "slug": "e-ihracatci",
+      "ad": "E-ihracatçı",
+      "aile": "kurucu",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "FevUp, D2X, EuroStep",
+      "ana_soru": "Hangi ürün, pazar ve büyüme kaldıracı?",
+      "kanal": "LinkedIn, Kaggle",
+      "sinir": "Rekabet yasağı alanları",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Pazar araştırması",
+        "Lojistik ve gümrük",
+        "Teşvik yönetimi"
+      ]
+    },
+    {
+      "slug": "yatirimci",
+      "ad": "Yatırımcı",
+      "aile": "kurucu",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "MTFG, fon portföyü",
+      "ana_soru": "Nakit akışı mı, değer mi, risk ne?",
+      "kanal": "Kapalı panel, seçili içerik",
+      "sinir": "Kişiye özel yatırım tavsiyesi yok (SPK)",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Değerleme",
+        "Portföy ve risk yönetimi",
+        "Sermaye piyasası mevzuatı"
+      ]
+    },
+    {
+      "slug": "ai-sistem-mimari",
+      "ad": "AI sistem mimarı",
+      "aile": "kurucu",
+      "dikey": "VARLIKLI",
+      "zaman": "guncel",
+      "baglam": "Commerce Engine, JCE, Vibe Management",
+      "ana_soru": "Hangi süreç ajanla otomatikleşir?",
+      "kanal": "GitHub, Hugging Face",
+      "sinir": "Veri güvenliği, KVKK",
+      "evre": "yaratici_aktif",
+      "yetenekler": [
+        "Ajan tasarımı",
+        "Veri yönetimi",
+        "Değerlendirme ve test"
+      ]
+    },
+    {
+      "slug": "akademisyen",
+      "ad": "Akademisyen",
+      "aile": "akademik",
+      "dikey": "BILGE",
+      "zaman": "guncel",
+      "baglam": "Doktora, doçentlik hedefi",
+      "ana_soru": "Bunu yayımlayabilir, öğretebilir miyim?",
+      "kanal": "Akademik yayın, Zenodo",
+      "sinir": "Bilimsel etik, atıf kuralları",
+      "evre": "yaratici_aktif",
+      "yetenekler": [
+        "Araştırma yöntemi",
+        "Akademik yazım",
+        "Literatür yönetimi"
+      ]
+    },
+    {
+      "slug": "arastirmaci-yazar",
+      "ad": "Araştırmacı-yazar",
+      "aile": "akademik",
+      "dikey": "BILGE",
+      "zaman": "guncel",
+      "baglam": "Hukuk ve Sinema, Türkiye 3X",
+      "ana_soru": "Hangi fikir kalıcı metne dönüşür?",
+      "kanal": "LinkedIn, web, bülten",
+      "sinir": "Telif ve alıntı kuralları",
+      "evre": "yaratici_aktif",
+      "yetenekler": [
+        "Anlatı kurma",
+        "Editörlük",
+        "Seri planlama"
+      ]
+    },
+    {
+      "slug": "konusmaci-ve-panelist",
+      "ad": "Konuşmacı ve panelist",
+      "aile": "akademik",
+      "dikey": "BILGE",
+      "zaman": "guncel",
+      "baglam": "COP31, girişim sunumları",
+      "ana_soru": "Bu fikir sahnede nasıl anlatılır?",
+      "kanal": "Etkinlik, video",
+      "sinir": "Kurum adına konuşma sınırı",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Hikaye anlatımı",
+        "Sahne hakimiyeti",
+        "Soru-cevap yönetimi"
+      ]
+    },
+    {
+      "slug": "egitmen",
+      "ad": "Eğitmen",
+      "aile": "akademik",
+      "dikey": "BILGE",
+      "zaman": "hedef",
+      "baglam": "Udemy, Borfin, MasterClass",
+      "ana_soru": "Kim, neyi, hangi sırayla öğrenecek?",
+      "kanal": "Kurs platformları",
+      "sinir": "Meslek kuralları, telif",
+      "evre": "cirak",
+      "yetenekler": [
+        "Öğretim tasarımı",
+        "Video üretimi",
+        "Ölçme ve değerlendirme"
+      ]
+    },
+    {
+      "slug": "dusunur-ve-okur",
+      "ad": "Düşünür ve okur",
+      "aile": "kisisel",
+      "dikey": "BILGE",
+      "zaman": "guncel",
+      "baglam": "Felsefe, sanat tarihi, politik ekonomi",
+      "ana_soru": "Bu beni nasıl dönüştürür?",
+      "kanal": "Özel arşiv, seçili deneme",
+      "sinir": "Mahremiyet",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Derin okuma",
+        "Sentez",
+        "Karşılaştırmalı analiz"
+      ]
+    },
+    {
+      "slug": "muzisyen",
+      "ad": "Müzisyen",
+      "aile": "kisisel",
+      "dikey": "MUTLU",
+      "zaman": "guncel",
+      "baglam": "Loop tabanlı prodüksiyon",
+      "ana_soru": "Ne yaratmak istiyorum?",
+      "kanal": "Kişisel kanal",
+      "sinir": "Telif",
+      "evre": "cirak",
+      "yetenekler": [
+        "Loop prodüksiyonu",
+        "Armoni",
+        "Ses tasarımı"
+      ]
+    },
+    {
+      "slug": "doga-insani",
+      "ad": "Doğa insanı",
+      "aile": "kisisel",
+      "dikey": "SAGLIKLI",
+      "zaman": "guncel",
+      "baglam": "Outdoor, kamp",
+      "ana_soru": "Nasıl dinç ve dengede kalırım?",
+      "kanal": "Kişisel",
+      "sinir": "Mahremiyet",
+      "evre": "belirlenecek",
+      "yetenekler": [
+        "Rota planlama",
+        "Dayanıklılık",
+        "Ekipman bilgisi"
+      ]
+    },
+    {
+      "slug": "aile-ve-iliski-rolleri",
+      "ad": "Aile ve ilişki rolleri",
+      "aile": "kisisel",
+      "dikey": "SEVGILI",
+      "zaman": "guncel",
+      "baglam": "Ferhan tanımlar",
+      "ana_soru": "Ferhan tanımlar",
+      "kanal": "Kişisel",
+      "sinir": "Mahremiyet",
+      "evre": "belirlenecek",
+      "yetenekler": []
+    }
+  ],
+  "projeler": [
+    {
+      "baslik": "Meridyen",
+      "taraf": "kisisel",
+      "durum": "hazirlik",
+      "birincil_kimlik": "Danışman ve mentor",
+      "ikincil_kimlik": "Tahkim uzmanı",
+      "kavramlar": [
+        "Proje finansmanı riski",
+        "Politik risk"
+      ],
+      "yetenekler": [
+        "Finansal analiz",
+        "Yatırım antlaşması analizi",
+        "Ajan tasarımı"
+      ],
+      "moduller": [
+        "Proje finansmanında risk dağılımı",
+        "Ajan geliştirme"
+      ],
+      "varliklar": [
+        "Meridyen ajanı (kişisel IP)",
+        "Makale",
+        "Kurs"
+      ],
+      "not_": "Seçili modüller sözleşmeyle şirkete aktarılır"
+    },
+    {
+      "baslik": "Savunma sanayii hukuku uyum metodolojisi",
+      "taraf": "kisisel",
+      "durum": "fikir",
+      "birincil_kimlik": "Avukat",
+      "ikincil_kimlik": "Harbiyeli ve subay",
+      "kavramlar": [
+        "İhracat kontrolü"
+      ],
+      "yetenekler": [
+        "Mevzuat takibi",
+        "Sözleşme tasarımı"
+      ],
+      "moduller": [],
+      "varliklar": [],
+      "not_": "Öğrenme ve varlık halkaları boş, bu yüzden başlamadı"
+    }
+  ],
+  "kanallar": [
+    {
+      "ad": "LinkedIn",
+      "tur": "medya",
+      "ritim": "Haftada 2–3",
+      "icerik": "Günün kartı, carousel, makale"
+    },
+    {
+      "ad": "Bülten",
+      "tur": "medya",
+      "ritim": "İki haftada 1",
+      "icerik": "Haftanın kartları, okuma listesi"
+    },
+    {
+      "ad": "Web arşivi",
+      "tur": "medya",
+      "ritim": "Bültenle",
+      "icerik": "Kalıcı makale, kavram sayfası"
+    },
+    {
+      "ad": "Akademik",
+      "tur": "medya",
+      "ritim": "Dönemlik",
+      "icerik": "Makale, bildiri, panel"
+    },
+    {
+      "ad": "Video ve ses",
+      "tur": "medya",
+      "ritim": "Ayda 2",
+      "icerik": "Kısa video, podcast (Higgsfield)"
+    },
+    {
+      "ad": "GitHub",
+      "tur": "teknik",
+      "ritim": "Her sürüm",
+      "icerik": "Ajan kodu, araçlar"
+    },
+    {
+      "ad": "Hugging Face",
+      "tur": "teknik",
+      "ritim": "Demo hazır olunca",
+      "icerik": "Veri seti, Space demo"
+    },
+    {
+      "ad": "Kaggle",
+      "tur": "teknik",
+      "ritim": "Veri yayınında",
+      "icerik": "Veri seti, notebook"
+    },
+    {
+      "ad": "Zenodo",
+      "tur": "teknik",
+      "ritim": "Ana sürümlerde",
+      "icerik": "DOI'li arşiv"
+    },
+    {
+      "ad": "Udemy, Borfin, MasterClass",
+      "tur": "egitim",
+      "ritim": "Modül olgunlaşınca",
+      "icerik": "Kurs"
+    }
+  ],
+  "ornek_kart": {
+    "baslik": "Risk, onu en iyi yönetebilecek tarafa yüklenir",
+    "tema": "Proje finansmanı riski",
+    "kimlik": "Danışman ve mentor",
+    "durum": "hazir",
+    "fikir": "Proje finansmanında her risk, onu en düşük maliyetle kontrol edebilecek tarafa sözleşmeyle yüklenir."
+  },
+  "ornek_metrikler": {
+    "not_": "Tasarım için örnek değerler, gerçek veri değildir",
+    "bekleyen_kart": 7,
+    "hazir_kart": 12,
+    "kimliksiz_kayit": 3,
+    "aktif_modul": 2,
+    "aktif_proje": 1,
+    "bu_ay_yayin": 5
+  }
+}

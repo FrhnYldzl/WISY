@@ -1,0 +1,73 @@
+# Wisy varlık tipleri. Doğrulayıcı (scripts/validate_vault.py) bu dosyayı okur.
+# required: zorunlu alanlar. enums: izin verilen değerler. links: [[wikilink]] olması gereken alanlar.
+
+enums:
+  taraf: [kisisel, sirket, ortak]
+  dikey: [BILGE, VARLIKLI, SAGLIKLI, MUTLU, SEVGILI]
+  evre: [cirak, yaratici_aktif, usta, belirlenecek]
+  zaman: [kok, guncel, hedef]
+  aile: [kok, mesleki, kurucu, akademik, kisisel]
+  varlik_sinifi: [donen, maddi, finansal, gayri_maddi, entelektuel]
+  basamak: [kart, gunun_karti, bulten, seri, kalici]
+  kanal: [linkedin, bulten, web, akademik, video, github, huggingface, kaggle, zenodo, kurs, kapali]
+  durum_kart: [taslak, beklemede, hazir, kullanildi]
+  durum_proje: [fikir, hazirlik, aktif, tamamlandi, arsiv]
+  durum_icerik: [fikir, taslak, onay, yayinda]
+  durum_modul: [planli, devam, tamamlandi]
+  kaynak_turu: [kitap, makale, dergi, rapor, kurs, bulten, video, veri, web, deneyim, sohbet]
+  ortam: [fiziksel, dijital]
+
+types:
+  kaynak:
+    required: [type, baslik, kaynak_turu, ortam, taraf]
+    enums: {kaynak_turu: kaynak_turu, ortam: ortam, taraf: taraf}
+
+  kart:
+    required: [type, kaynak, tema, birincil_kimlik, taraf, durum]
+    enums: {taraf: taraf, durum: durum_kart}
+    links: [kaynak, tema, birincil_kimlik, ikincil_kimlik]
+
+  kavram:
+    required: [type, eksen_disiplin, eksen_fonksiyon, eksen_sektor]
+    links: [ilgili]
+
+  kimlik:
+    required: [type, ad, aile, dikey, zaman, ana_soru]
+    enums: {aile: aile, dikey: dikey, zaman: zaman, evre: evre}
+
+  yetenek:
+    required: [type, ad, kimlik, evre, hedef_evre]
+    enums: {evre: evre, hedef_evre: evre}
+    links: [kimlik]
+
+  modul:
+    required: [type, baslik, birincil_kimlik, yetenekler, taraf, durum]
+    enums: {taraf: taraf, durum: durum_modul}
+    links: [birincil_kimlik, ikincil_kimlik, yetenekler, kavramlar]
+
+  proje:
+    required: [type, baslik, birincil_kimlik, taraf, durum]
+    enums: {taraf: taraf, durum: durum_proje}
+    links: [birincil_kimlik, ikincil_kimlik, kavramlar, yetenekler, moduller, varliklar]
+    # Hikaye kartı: durum 'aktif' veya 'tamamlandi' ise bu alanların hepsi dolu olmalı
+    hikaye_zinciri: [kavramlar, birincil_kimlik, yetenekler, moduller, varliklar]
+
+  varlik:
+    required: [type, ad, varlik_sinifi, taraf]
+    enums: {varlik_sinifi: varlik_sinifi, taraf: taraf}
+    links: [birincil_kimlik, kaynak_proje]
+
+  icerik:
+    required: [type, baslik, birincil_kimlik, kanal, basamak, taraf, durum]
+    enums: {kanal: kanal, basamak: basamak, taraf: taraf, durum: durum_icerik}
+    links: [birincil_kimlik, kartlar]
+
+  sicil:
+    required: [type, ad, tur, kanit]
+    # tur: diploma | lisans | sertifika | kurs | yayin
+
+rules:
+  ortak_taraf_birincil: "taraf 'ortak' ise birincil_taraf (kisisel|sirket) zorunlu"
+  avukat_uyum: "birincil_kimlik avukat olan icerik yayinda/onay durumundaysa uyum.tbb: true olmalı"
+  yatirimci_uyum: "birincil_kimlik yatirimci olan icerik yayinda/onay durumundaysa uyum.spk: true olmalı"
+  kart_bekleme: "durum 'hazir' olan kartta bekleme_bitis bugünden ileri olamaz"

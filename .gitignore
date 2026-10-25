@@ -1,0 +1,4 @@
+node_modules/
+var/
+.env
+.obsidian/workspace*.json
