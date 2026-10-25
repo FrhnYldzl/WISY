@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { cpSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
+import { deflateRawSync } from "node:zlib";
 import { join } from "node:path";
 import { test } from "node:test";
 import { extractProposals, loadAgents, systemFor } from "./agents.ts";
-import { buildApp } from "./app.ts";
+import { buildApp, claudeError } from "./app.ts";
 import { authFromEnv, hashPassword, verifyPassword } from "./auth.ts";
 import { Writer } from "./apply.ts";
+import { docxToText, toBlock, xlsxToText } from "./files.ts";
 import { buildModel } from "./model.ts";
 import { check, loadSchema } from "./rules.ts";
 import { parseFrontmatter, replaceField, Vault } from "./vault.ts";
@@ -156,4 +158,61 @@ test("ajan talimatı şemadaki zorunlu alanları listeler", () => {
   const s = systemFor(ROOT, agents.find((a) => a.id === "kutuphaneci")!, agents);
   assert.match(s, /- kaynak: kaynak_turu \(kitap\|makale/);
   assert.match(s, /ortam \(fiziksel\|dijital\)/);
+});
+
+/* ---- ekler: sentetik zip (xlsx / docx) — gerçek Office dosyasının asgari yapısı ---- */
+function zipOf(files: Record<string, string>): Buffer {
+  const parts: Buffer[] = [], central: Buffer[] = []; let off = 0;
+  for (const [name, text] of Object.entries(files)) {
+    const data = deflateRawSync(Buffer.from(text)), n = Buffer.from(name);
+    const loc = Buffer.alloc(30); loc.writeUInt32LE(0x04034b50, 0); loc.writeUInt16LE(8, 8); loc.writeUInt32LE(data.length, 18); loc.writeUInt16LE(n.length, 26);
+    const cen = Buffer.alloc(46); cen.writeUInt32LE(0x02014b50, 0); cen.writeUInt16LE(8, 10); cen.writeUInt32LE(data.length, 20); cen.writeUInt16LE(n.length, 28); cen.writeUInt32LE(off, 42);
+    parts.push(loc, n, data); central.push(cen, n); off += 30 + n.length + data.length;
+  }
+  const cd = Buffer.concat(central), end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(Object.keys(files).length, 10); end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(off, 16);
+  return Buffer.concat([...parts, cd, end]);
+}
+
+test("ekler: xlsx sayfaları sıkı biçimde okunur, docx metni çıkar, PDF belge bloğu olur", () => {
+  const xlsx = zipOf({
+    "xl/workbook.xml": '<workbook><sheets><sheet name="Bütçe" r:id="rId1"/><sheet name="6. Reklam Varsayımları" r:id="rId2"/></sheets></workbook>',
+    "xl/_rels/workbook.xml.rels": '<Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Target="worksheets/sheet2.xml"/></Relationships>',
+    "xl/sharedStrings.xml": "<sst><si><t>Kanal</t></si><si><t>Amazon DE</t></si><si><r><t>RO</t></r><r><t>AS</t></r></si></sst>",
+    "xl/worksheets/sheet1.xml": '<sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="C1"><v>1500.123456</v></c></row><row r="2"/><row r="3"><c r="A3" t="s"><v>1</v></c><c r="B3"><f>SUM(C1)</f></c></row></sheetData>',
+    "xl/worksheets/sheet2.xml": '<sheetData><row r="4"><c r="AB4" t="s"><v>2</v></c><c r="AC4" t="inlineStr"><is><t>3,5</t></is></c></row></sheetData>',
+  });
+  const t = xlsxToText(xlsx);
+  assert.match(t, /2 sayfa: Bütçe, 6\. Reklam Varsayımları/);
+  assert.match(t, /\n1 \| A: Kanal \| C: 1500\.12\n/);   // seyrek, ondalık kısaltıldı
+  assert.match(t, /3 \| A: Amazon DE\n/);                 // boş satır ve değersiz formül atlandı
+  assert.match(t, /Bütçe \(2 dolu satır · 1 formül hücresinde kayıtlı değer yok\)/);
+  assert.match(t, /4 \| AB: ROAS \| AC: 3,5/);            // çok harfli sütun, bölünmüş zengin metin
+  const docx = zipOf({ "word/document.xml": "<w:document><w:body><w:p><w:r><w:t>EuroStep</w:t></w:r><w:r><w:t> planı</w:t></w:r></w:p><w:p><w:r><w:t>Q1 hedef</w:t></w:r></w:p></w:body></w:document>" });
+  assert.equal(docxToText(docx), "EuroStep planı\nQ1 hedef");
+  const blk = toBlock({ ad: "rapor.xlsx", b64: xlsx.toString("base64") });
+  assert.equal(blk.type, "text");
+  assert.equal(toBlock({ ad: "s.pdf", b64: "JVBERi0=" }).type, "document");
+  assert.equal(toBlock({ ad: "g.PNG", b64: "iVBOR" }).type, "image");
+  assert.match((toBlock({ ad: "eski.xls", b64: "AAAA" }) as { text: string }).text, /eski Office biçimi/);
+  assert.match((toBlock({ ad: "bozuk.xlsx", b64: "AAAA" }) as { text: string }).text, /okunamadı.*uydurma/);
+});
+
+test("API: ekler Claude'a blok olarak gider; kimlik listesi kapsamdan bağımsız", async () => {
+  let seen: { system: string; messages: { content: { type: string; text?: string }[] }[] } | null = null;
+  const client = { messages: { stream: (p: never) => { seen = p; return { on: () => {}, finalMessage: async () => ({ stop_reason: "end_turn", usage: { input_tokens: 1, output_tokens: 1 } }) }; } } };
+  const app = buildApp({ root: ROOT, vaultPath: tmpVault().root, dataPath: ":memory:", client: client as never, auth: OFF });
+  try {
+    const pdf = await app.inject({ method: "POST", url: "/api/agents/run", payload: { ajan: "hoca", gorev: "oku", kim: "performans-pazarlamaci", dosyalar: [{ ad: "plan.pdf", b64: "JVBERi0=" }, { ad: "not.md", metin: "# başlık" }] } });
+    assert.equal(pdf.statusCode, 200);
+    const content = seen!.messages.at(-1)!.content;
+    assert.deepEqual(content.map((c) => c.type), ["document", "text"]);
+    assert.match(content[1]!.text!, /Ek dosya: not\.md[\s\S]*oku$/);
+    assert.match(seen!.system, /"kimlik_listesi":\[[^\]]*"id":"seri-girisimci"/); // kapsam performans olsa da
+  } finally { await app.close(); }
+});
+
+test("Claude hataları Türkçe ve yönlendirici", () => {
+  assert.match(claudeError(new Error('400 {"error":{"message":"Your credit balance is too low to access the Anthropic API."}}')), /kredi kalmadı.*Plans & Billing/);
+  assert.match(claudeError(new Error("x")), /^x$/);
 });

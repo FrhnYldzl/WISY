@@ -186,8 +186,8 @@ const Studio=(()=>{
       ${ST.flow?`<div class="flowchip"><span class="lbl">Akış</span><b>${esc(ST.flow.ad)}</b><span class="mini-chain">${ST.flow.adimlar.map((s,k)=>`${k?"<b></b>":""}<span title="${esc(A(s).ad)}">${esc(A(s).kisa)}</span>`).join("")}</span><span class="small muted">${esc(ST.flow.aciklama)}</span><button class="btn sm ghost" data-sflow-x="1" style="margin-left:auto">✕</button></div>`:""}
       <label for="sq" style="position:absolute;left:-9999px">İstek</label>
       <textarea id="sq" rows="3" placeholder="${ST.flow?esc(ST.flow.girdi?`Girdi: ${ST.flow.girdi}`:"Girdi gerekmez; Çalıştır'a bas."):`${esc(a.ad)} için iste. Ör. “Bu hafta okuduğum ekonomi politik notlarını kartlara çevir.” Dosya ekleyip “bunu kartlara böl” de diyebilirsin.`}">${esc(ST.draft)}</textarea>
-      ${ST.files.length?`<div class="atts">${ST.files.map((f,k)=>`<span class="att">${esc(f.ad)} · ${Math.round(f.metin.length/1000)}k <button data-sfile-x="${k}" aria-label="Kaldır">✕</button></span>`).join("")}</div>`:""}
-      <div class="cfoot"><button class="btn sm ghost" data-sfile="1"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10.5 5.5l-4.6 4.6a1.6 1.6 0 002.3 2.3l5-5a3 3 0 00-4.3-4.3l-5.3 5.3a4.4 4.4 0 006.3 6.3l4.4-4.4"/></svg>Dosya ekle</button><input type="file" id="sfin" multiple hidden accept=".txt,.md,.csv,.json,.html,.htm,.xml">
+      ${ST.files.length?`<div class="atts">${ST.files.map((f,k)=>`<span class="att">${esc(f.ad)} · ${f.boyut<1e6?Math.max(1,Math.round(f.boyut/1000))+" KB":(f.boyut/1e6).toFixed(1)+" MB"} <button data-sfile-x="${k}" aria-label="Kaldır">✕</button></span>`).join("")}</div>`:""}
+      <div class="cfoot"><button class="btn sm ghost" data-sfile="1"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10.5 5.5l-4.6 4.6a1.6 1.6 0 002.3 2.3l5-5a3 3 0 00-4.3-4.3l-5.3 5.3a4.4 4.4 0 006.3 6.3l4.4-4.4"/></svg>Dosya ekle</button><input type="file" id="sfin" multiple hidden accept=".txt,.md,.csv,.json,.html,.htm,.xml,.xlsx,.xlsm,.xls,.docx,.doc,.pptx,.pdf,.png,.jpg,.jpeg,.webp,.gif">
         <span class="tiny muted">${ST.flow?`${ST.flow.adimlar.length} adım sırayla çalışır`:`${esc(a.ad)} · katman ${esc(a.katman)}`}</span><span class="spacer"></span>
         <select class="sel" id="stier" aria-label="Model kademesi">${Object.entries(TIER_AD).map(([k,l])=>`<option value="${k}" ${ST.tier===k?"selected":""}>${l}</option>`).join("")}</select>
         ${ST.busy?`<button class="btn" data-sstop="1">Durdur</button>`:`<button class="btn pri" data-srun="1">Çalıştır<kbd>Ctrl ↵</kbd></button>`}</div>
@@ -228,7 +228,12 @@ const Studio=(()=>{
     ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();run()}});
     $("#skim").addEventListener("change",e=>{ST.kim=e.target.value;render()});
     $("#stier").addEventListener("change",e=>{ST.tier=e.target.value});
-    $("#sfin").addEventListener("change",async e=>{for(const f of e.target.files){const t=await f.text();ST.files.push({ad:f.name,metin:t.slice(0,200000)})}render()});
+    $("#sfin").addEventListener("change",async e=>{for(const f of e.target.files){
+      // metin dosyaları metin olarak; Excel, Word, PowerPoint, PDF ve görseller base64 (sunucu files.ts ile açar)
+      if(f.size>10e6){toast(`${f.name}: 10 MB sınırını aşıyor`);continue}
+      const txt=/\.(txt|md|csv|json|html?|xml)$/i.test(f.name);
+      const b64=txt?null:await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(f)});
+      ST.files.push(txt?{ad:f.name,tur:f.type,boyut:f.size,metin:(await f.text()).slice(0,400000)}:{ad:f.name,tur:f.type,boyut:f.size,b64})}render()});
     if(ST.focus){ST.focus=false;ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);document.getElementById("composer").scrollIntoView({block:"center"})}
   }
   document.addEventListener("click",async e=>{

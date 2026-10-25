@@ -54,7 +54,8 @@ export function loadAgents(root: string): { agents: AgentDef[]; flows: FlowDef[]
 /* ---------------- bağlam ---------------- */
 export function contextFor(model: Model, sources: string[], kim?: string | null, extra?: { kaynaklar?: { id: string; baslik: string; tur: string }[] }) {
   const K = (x: { kim?: string | null; kim2?: string | null }) => !kim || x.kim === kim || x.kim2 === kim;
-  const out: Record<string, unknown> = { bugun: model.today };
+  // kimlik listesi her zaman var (kısa): kapsam tek kimliğe daralsa da ajan başka bir kimliği önerebilsin
+  const out: Record<string, unknown> = { bugun: model.today, kimlik_listesi: model.ids.map((i) => ({ id: i.slug, ad: i.ad, aile: i.aile })) };
   const S = new Set(sources);
   if (S.has("kimlikler")) out.kimlikler = model.ids.filter((i) => !kim || i.slug === kim).map(({ slug, ad, aile, zaman, soru, evre, yet, sinir, kanal, son }) => ({ id: slug, ad, aile, zaman, ana_soru: soru, evre, yetenekler: yet, sinir, kanal, son_kayit_gun: son }));
   if (S.has("kimliksiz")) out.kimliksiz = model.noid;

@@ -11,6 +11,7 @@ import { contextFor, extractProposals, loadAgents, SOURCES, systemFor } from "./
 import { Writer } from "./apply.ts";
 import { buildModel } from "./model.ts";
 import { check, loadSchema } from "./rules.ts";
+import { toBlock } from "./files.ts";
 import { openStore, type Store } from "./store.ts";
 import { type AuthConfig, authFromEnv, registerAuth } from "./auth.ts";
 import { str, Vault } from "./vault.ts";
@@ -25,10 +26,22 @@ const MAX_TOKENS: Record<Tier, number> = { quick: 4000, default: 12000, complex:
 const cost = (model: string, i: number, o: number) => { const p = PRICES[model]; return p ? (i * p.in + o * p.out) / 1e6 : 0; };
 const monthStart = () => { const d = new Date(); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1)).toISOString(); };
 
+/** Anthropic hatasını Ferhan'ın ne yapacağını söyleyen Türkçe metne çevirir; ham ayrıntı sonda kalır */
+export function claudeError(e: unknown): string {
+  const status = e instanceof Anthropic.APIError ? e.status : undefined;
+  const raw = String((e as Error)?.message ?? e);
+  if (/credit balance is too low/i.test(raw)) return "Anthropic hesabında kredi kalmadı. console.anthropic.com → Plans & Billing'den kredi yükleyin; Wisy anahtarı değişmeden çalışmaya devam eder.";
+  if (status === 401 || /invalid x-api-key|authentication/i.test(raw)) return "Claude anahtarı geçersiz. WISY_MANAGEMENT değerini Anthropic Console'daki Wisy anahtarıyla güncelleyin.";
+  if (status === 429) return "Claude hız sınırına takıldı. Bir dakika sonra yeniden deneyin.";
+  if (status === 529 || /overloaded/i.test(raw)) return "Claude şu an yoğun. Biraz sonra yeniden deneyin.";
+  if (status === 413 || /prompt is too long|too large/i.test(raw)) return "İstek çok büyük: eki küçültün ya da daha az bağlam seçin.";
+  return status ? `Claude hatası (${status}): ${raw}` : raw;
+}
+
 export interface AppOpts { root: string; vaultPath?: string; dataPath?: string; logger?: boolean; client?: Pick<Anthropic, "messages"> | null; auth?: AuthConfig }
 
 export function buildApp({ root, vaultPath, dataPath, logger = false, client, auth = authFromEnv() }: AppOpts) {
-  const app = Fastify({ logger, bodyLimit: 2_000_000, trustProxy: true }); // Railway vekil sunucusu → x-forwarded-proto
+  const app = Fastify({ logger, bodyLimit: 40_000_000, trustProxy: true }); // ekler base64 gelir · Railway vekil sunucusu → x-forwarded-proto
   registerAuth(app, auth);
   const vault = new Vault(vaultPath ?? process.env.WISY_VAULT ?? join(root, "vault"));
   if (!existsSync(vault.root)) throw new Error(`Kasa bulunamadı: ${vault.root} (WISY_VAULT ile yol verin)`);
@@ -79,7 +92,7 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
   const RunBody = z.object({
     ajan: z.string(), gorev: z.string().min(1).max(20000), kim: z.string().nullable().optional(), kaynaklar: z.array(z.enum(SOURCES)).optional(),
     gecmis: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() })).max(40).default([]), onceki: z.string().max(40000).optional(),
-    tier: z.enum(["quick", "default", "complex"]).default("default"), dosyalar: z.array(z.object({ ad: z.string(), metin: z.string().max(200000) })).max(8).default([]),
+    tier: z.enum(["quick", "default", "complex"]).default("default"), dosyalar: z.array(z.object({ ad: z.string().max(200), tur: z.string().max(120).optional(), metin: z.string().max(400_000).optional(), b64: z.string().max(14_000_000).optional() })).max(8).default([]),
   });
   app.post("/api/agents/run", async (req, reply) => {
     const b = RunBody.parse(req.body);
@@ -91,12 +104,15 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
     const m = model();
     const ctx = contextFor(m, b.kaynaklar ?? agent.kaynaklar, b.kim, { kaynaklar: m.kaynaklar });
     const system = `${systemFor(root, agent, agents)}\n\n## Kasa bağlamı${b.kim ? ` (kapsam: ${b.kim})` : ""}\n\`\`\`json\n${JSON.stringify(ctx)}\n\`\`\``;
-    const user = [b.onceki ? `Önceki adımın çıktısı (akış):\n${b.onceki}` : "", ...b.dosyalar.map((f) => `Ek dosya: ${f.ad}\n${f.metin}`), b.gorev].filter(Boolean).join("\n\n---\n\n");
+    // ekler: xlsx/docx/pptx metne, PDF ve görsel Claude bloğuna (files.ts); görev metni en sonda
+    const blocks = b.dosyalar.map(toBlock);
+    const text = [b.onceki ? `Önceki adımın çıktısı (akış):\n${b.onceki}` : "", ...blocks.flatMap((x) => (x.type === "text" ? [x.text] : [])), b.gorev].filter(Boolean).join("\n\n---\n\n");
+    const user = [...blocks.filter((x) => x.type !== "text"), { type: "text" as const, text }];
     const modelId = TIER[b.tier];
     reply.raw.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
     const send = (o: unknown) => reply.raw.write(`data: ${JSON.stringify(o)}\n\n`);
     try {
-      const stream = c.messages.stream({ model: modelId, max_tokens: MAX_TOKENS[b.tier], system, messages: [...b.gecmis, { role: "user", content: user }] });
+      const stream = c.messages.stream({ model: modelId, max_tokens: MAX_TOKENS[b.tier], system, messages: [...b.gecmis, { role: "user", content: user as never }] });
       let text = "";
       stream.on("text", (d) => { text += d; send({ delta: d }); });
       const fin = await stream.finalMessage();
@@ -107,7 +123,7 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
       send({ usage: { model: modelId, tier: b.tier, input: fin.usage.input_tokens, output: fin.usage.output_tokens, usd, ayUsd: spent + usd, tavanUsd: budget } });
       reply.raw.write("data: [DONE]\n\n");
     } catch (e) {
-      send({ error: e instanceof Anthropic.APIError ? `${e.status} ${e.message}` : String((e as Error).message ?? e) });
+      send({ error: claudeError(e) });
     }
     reply.raw.end();
     return reply;
