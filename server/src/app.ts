@@ -1,6 +1,6 @@
 // Wisy tek servis:  /  panel (public/)  ·  /api/*  kasa modeli, öneri uygulama, ajan orkestratörü, stüdyo durumu.
 // Kasa kişisel veridir (docs/06 · Veri ve gizlilik): yerelde yalnız 127.0.0.1, dağıtımda parola zorunlu (auth.ts).
-// Claude anahtarı yalnız WISY_ANTHROPIC_API_KEY'dir; genel ANTHROPIC_API_KEY bilerek okunmaz (başka projenin anahtarıyla karışmasın).
+// Claude anahtarı yalnız WISY_MANAGEMENT'dir; genel ANTHROPIC_API_KEY bilerek okunmaz (başka projenin anahtarıyla karışmasın).
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
@@ -37,7 +37,7 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
   const store: Store = openStore(dataPath ?? process.env.WISY_DATA ?? join(root, "var", "wisy.db"));
   const budget = Number(process.env.WISY_AYLIK_TAVAN_USD) || 30;
   let anthropic: Pick<Anthropic, "messages"> | null | undefined = client;
-  const apiKey = process.env.WISY_ANTHROPIC_API_KEY || "";
+  const apiKey = process.env.WISY_MANAGEMENT || "";
   const claude = () => (anthropic ??= apiKey ? new Anthropic({ apiKey }) : null);
   const hasClaude = Boolean(apiKey || client);
   app.addHook("onClose", async () => store.close());
@@ -85,7 +85,7 @@ export function buildApp({ root, vaultPath, dataPath, logger = false, client, au
     const b = RunBody.parse(req.body);
     const { agents } = defs();
     const agent = agents.find((a) => a.id === b.ajan); if (!agent) return reply.status(404).send({ hata: `Ajan yok: ${b.ajan}` });
-    const c = claude(); if (!c) return reply.status(503).send({ hata: "WISY_ANTHROPIC_API_KEY tanımlı değil — .env (yerel) ya da Railway Variables içine ekleyin." });
+    const c = claude(); if (!c) return reply.status(503).send({ hata: "WISY_MANAGEMENT tanımlı değil — .env (yerel) ya da Railway Variables içine ekleyin." });
     const spent = store.usageSince(monthStart()).usd;
     if (budget > 0 && spent >= budget) return reply.status(402).send({ hata: `Aylık bütçe doldu ($${spent.toFixed(2)} / $${budget}). WISY_AYLIK_TAVAN_USD ile artırın.` });
     const m = model();

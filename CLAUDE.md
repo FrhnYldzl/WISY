@@ -60,7 +60,7 @@ public/                   panel + Wisy Stüdyo
 
 ## Panel (Faz 6, v0.1 — 25.10.2026)
 
-- **Bağımsızlık**: Wisy ayrı üründür. Depo `FrhnYldzl/WISY` (özel), ayrı Railway projesi, ayrı Claude anahtarı. Anahtar yalnız `WISY_ANTHROPIC_API_KEY`; genel `ANTHROPIC_API_KEY` okunmaz. Başka projeden değişken, kod ya da veri kopyalanmaz.
+- **Bağımsızlık**: Wisy ayrı üründür. Depo `FrhnYldzl/WISY` (şimdilik açık; özel yapılacak — gerçek kasa verisi depoya girmez), ayrı Railway projesi, ayrı Claude anahtarı. Anahtar yalnız `WISY_MANAGEMENT`; genel `ANTHROPIC_API_KEY` okunmaz. Başka projeden değişken, kod ya da veri kopyalanmaz.
 - **Yığın**: Fastify + node:sqlite + Anthropic SDK + zod + tsx. Yerelde port 8788, yalnız 127.0.0.1; Railway'de `PORT` ve 0.0.0.0.
 - **Giriş**: `auth.ts`. `NODE_ENV=production` iken `WISY_PASSWORD_HASH` + `WISY_SESSION_SECRET` zorunlu. Dağıtımda kasa Volume'de (`/data/vault`), ilk açılışta depodaki `vault/` tohumdur.
 - **Tasarım**: `design/claude-design-cikti/wisy-merkez-omurga-v1.html` omurgadır; token, kabuk ve bileşenler değiştirilmez. Yeni ekranlar (Stüdyo, Ajanlar) yalnız bu token'larla yazılır.

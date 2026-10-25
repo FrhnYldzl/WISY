@@ -7,7 +7,7 @@
 Kavramlar → Kimlikler → Yetenekler → Öğrenme → Projeler → Varlıklar
 ```
 
-Wisy bağımsız bir üründür: kendi deposu (`FrhnYldzl/WISY`, özel), kendi Railway projesi ve kendi Claude anahtarı.
+Wisy bağımsız bir üründür: kendi deposu (`FrhnYldzl/WISY`), kendi Railway projesi ve kendi Claude anahtarı.
 Şirket tarafıyla ilişkisi yalnız kavramsaldır (panelde **Köprü**): veri, anahtar ve dağıtım paylaşılmaz.
 
 ## Yerelde çalıştırma
@@ -22,7 +22,7 @@ npm install
 npm start
 ```
 
-→ http://localhost:8788. Stüdyo için `.env` içine `WISY_ANTHROPIC_API_KEY` (bkz. `.env.example`).
+→ http://localhost:8788. Stüdyo için `.env` içine `WISY_MANAGEMENT` (bkz. `.env.example`).
 `public/index.html` sunucusuz da açılır; o zaman panel **Örnek** veriyle çalışır.
 
 ```bash
@@ -42,7 +42,7 @@ npm run validate
 | Değişken | Değer |
 |---|---|
 | `NODE_ENV` | `production` |
-| `WISY_ANTHROPIC_API_KEY` | Wisy'ye ait anahtar |
+| `WISY_MANAGEMENT` | Wisy'ye ait anahtar |
 | `WISY_PASSWORD_HASH` | `npm run sifre -- "<parola>"` çıktısı |
 | `WISY_SESSION_SECRET` | uzun rastgele metin |
 | `WISY_VAULT` | `/data/vault` |

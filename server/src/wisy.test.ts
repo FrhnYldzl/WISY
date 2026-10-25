@@ -106,7 +106,7 @@ test("API: ajan akışı SSE ile döner, öneri bloğu ayrıştırılır (sahte 
 
 test("API: model, apply, anahtarsız ajan 503", async () => {
   const v = tmpVault();
-  const prev = process.env.WISY_ANTHROPIC_API_KEY; delete process.env.WISY_ANTHROPIC_API_KEY;
+  const prev = process.env.WISY_MANAGEMENT; delete process.env.WISY_MANAGEMENT;
   process.env.ANTHROPIC_API_KEY ??= "baska-projenin-anahtari"; // genel ad okunmamalı
   const app = buildApp({ root: ROOT, vaultPath: v.root, dataPath: ":memory:", client: null, auth: OFF });
   try {
@@ -116,7 +116,7 @@ test("API: model, apply, anahtarsız ajan 503", async () => {
     assert.equal((await app.inject("/api/model")).json().noid.length, 1); // kimliksiz kart dikkat listesine düşer
     const r = await app.inject({ method: "POST", url: "/api/agents/run", payload: { ajan: "hoca", gorev: "x" } });
     assert.equal(r.statusCode, 503);
-  } finally { if (prev) process.env.WISY_ANTHROPIC_API_KEY = prev; await app.close(); }
+  } finally { if (prev) process.env.WISY_MANAGEMENT = prev; await app.close(); }
 });
 
 test("giriş: dağıtımda parolasız başlamaz; parola ve oturum doğrulanır", async () => {

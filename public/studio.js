@@ -129,7 +129,7 @@ const Studio=(()=>{
     const task=ST.draft.trim(); if(ST.busy) return;
     if(!task&&!(ST.flow&&!ST.flow.girdi)){ta&&ta.focus();return}
     if(!ST.server){toast("Stüdyo sunucuyla çalışır: npm start");return}
-    if(!ST.claude){toast("Claude bağlı değil: WISY_ANTHROPIC_API_KEY tanımlayın");return}
+    if(!ST.claude){toast("Claude bağlı değil: WISY_MANAGEMENT tanımlayın");return}
     if(!ST.cur){ST.cur={id:uid(),ts:new Date().toISOString(),title:(task||ST.flow.ad).slice(0,80),ajan:ST.flow?ST.flow.ad:ST.ajan,msgs:[]};ST.sessions.unshift(ST.cur)}
     const flow=ST.flow, files=ST.files.slice(), steps=flow?flow.adimlar:[ST.ajan];
     ST.files=[]; ST.draft=""; ST.flow=null; ST.busy=true;
@@ -178,7 +178,7 @@ const Studio=(()=>{
     const status=!ST.server?`<span class="dot off"></span>Wisy Stüdyo · sunucu yok`:ST.claude?`<span class="dot"></span>Wisy Stüdyo · Claude bağlı`:`<span class="dot warn"></span>Wisy Stüdyo · Claude anahtarı yok`;
     const head=`<header class="phead"><div class="ph-l"><div class="eyebrow" style="color:var(--ink-3)">${status}${LIVE()?`<span class="st live">Kasa · canlı</span>`:`<span class="st">Örnek veri</span>`}</div><h1 class="hero">Bugün neyi <em>öğrenip</em> neye dönüştürüyoruz?</h1><p class="lead">Kasanın tamamı tek komut satırında. Bir ajan seç ya da orkestratöre bırak; öneriler kasaya yalnız senin onayınla, kural denetiminden geçerek yazılır.</p></div><div class="actions"><button class="btn" data-snew="1">+ Yeni oturum</button><button class="btn ghost" data-view="oturumlar">Oturumlar · ${ST.sessions.length}</button></div></header>`;
     const notice=!ST.server?`<div class="notice"><b>Sunucu yok.</b><span>Stüdyo kasayı okuyan yerel sunucuyla çalışır: <code>wisy</code> klasöründe <code>npm start</code>, sonra <code>http://localhost:8788</code>.</span></div>`
-      :!ST.claude?`<div class="notice"><b>Claude bağlı değil.</b><span>Yerelde <code>.env</code>, dağıtımda Railway Variables içine <code>WISY_ANTHROPIC_API_KEY=…</code> ekleyip sunucuyu yeniden başlatın. Panel, kasa yazımı ve hızlı kart anahtarsız da çalışır.</span></div>`:"";
+      :!ST.claude?`<div class="notice"><b>Claude bağlı değil.</b><span>Yerelde <code>.env</code>, dağıtımda Railway Variables içine <code>WISY_MANAGEMENT=…</code> ekleyip sunucuyu yeniden başlatın. Panel, kasa yazımı ve hızlı kart anahtarsız da çalışır.</span></div>`:"";
     const composer=`<div class="composer" id="composer">
       <div class="crow"><span class="lbl">Ajan</span>${ST.agents.map(x=>`<button class="opt ${x.id===ST.ajan&&!ST.flow?"on":""}" data-sag="${x.id}" title="${esc(x.aciklama)}"><span class="mk">${esc(x.kisa)}</span>${esc(x.ad)}</button>`).join("")}</div>
       <div class="crow"><span class="lbl">Kapsam</span><button class="opt ${!ST.kim?"on":""}" data-skim="">Tüm kasa</button><select class="sel" id="skim" aria-label="Kimlik kapsamı"><option value="">Bir kimlik seç…</option>${famOrder.map(f=>`<optgroup label="${FAM[f].ad}">${IDS.filter(i=>i.aile===f).map(i=>`<option value="${esc(i.slug)}" ${ST.kim===i.slug?"selected":""}>${esc(i.ad)}</option>`).join("")}</optgroup>`).join("")}</select>${ST.kim?idb(ST.kim):""}</div>
